@@ -1,0 +1,27 @@
+directories:
+  output: release/${version}
+  buildResources: build
+productName: 测试
+appId: test.empower
+asar: true
+files:
+  - filter:
+      - dist
+      - electron
+nsis:
+  oneClick: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  installerIcon: ./electron/build/icons/favicon.ico
+  uninstallerIcon: ./electron/build/icons/favicon.ico
+  installerHeaderIcon: ./electron/build/icons/favicon.ico
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+win:
+  icon: ./electron/build/icons/favicon.ico
+  target:
+    - target: nsis
+      arch:
+        - ia32
+linux: {}
+electronVersion: 23.1.3
