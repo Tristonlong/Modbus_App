@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import 'normalize.css/normalize.css'
 import i18n from '@/locale'
 // import { VueI18n } from 'vue-i18n'
 import App from './App.vue'

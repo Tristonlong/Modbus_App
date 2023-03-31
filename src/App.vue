@@ -4,10 +4,11 @@ import { ref, onMounted } from 'vue'
 import Header from './layout/Header.vue'
 import tarbar from './layout/tarbar.vue'
 import Locking from './pages/Locking/index.vue'
-// import { initWebSocket } from './utils/websocket'
+import Emergency from './pages/Dialog/Emergency.vue'
+
 import { sendSock, createWebSocket, closeSock } from './utils/websocket'
 
-const showLockingView = ref(true)
+const showLockingView = ref(false)
 
 function unLocking() {
   showLockingView.value = !showLockingView.value
@@ -22,31 +23,12 @@ const Btnlocking = ref(true)
 
 const projectId = ref({})
 
-onMounted(() => {
-  // initWebSocket()
-  // 初始化websocket
-  // createWebSocket(global_callback)
-  // // 接受到数据
-  // function global_callback(msg) {
-  //   // console.log('接收到websocket' + JSON.stringify(msg))
-  //   // console.log(123)
-  //   // console.log(msg)
-  //   // projectId.value = msg
-  //   // console.log(websocketLIstanbul.value)
-  //   // console.log(websocketLIstanbul.value.laserAlarm)
-  // }
-  // // 发送数据
-  // var senData = {
-  //   // JSON.stringify(msg)
-  //   data: 23,
-  // }
-  // sendSock(JSON.stringify(senData))
-})
+// 紧急停止
+const EmergencyTime = ref(true)
+onMounted(() => {})
 </script>
 
 <template>
-  <!-- <router-link to="/about">123</router-link>
-                                               -->
   <div>
     <!-- 主体内容 -->
     <Header></Header>
@@ -67,7 +49,8 @@ onMounted(() => {
         @click="unLocking()"
         :class="showLockingView ? '' : 'aclockingbtn'"></Locking>
     </div>
-    <!-- <MainPage></MainPage> -->
+
+    <!-- <Emergency class="emergency"></Emergency> -->
   </div>
 </template>
 
@@ -75,6 +58,7 @@ onMounted(() => {
 .mainContent {
   display: flex;
   flex-direction: row;
+  position: absolute;
 }
 .lockingbtn {
   width: 140px;
@@ -99,5 +83,10 @@ onMounted(() => {
     letter-spacing: 0px;
     text-align: left;
   }
+}
+.emergency {
+  position: fixed;
+  height: 720px;
+  // margin: 0px;
 }
 </style>

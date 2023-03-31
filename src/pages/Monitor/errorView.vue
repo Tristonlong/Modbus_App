@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-let timeCount = ref(5)
+let timeCount = ref(3)
 let showDialog = ref(true)
 const timer = ref()
 const count = ref()
@@ -21,7 +21,7 @@ onMounted(() => {
     <div class="main-content">
       <div class="main-content-text">屏幕已锁定({{ timeCount }}s)</div>
       <div class="main-content-article">温度过高(8)</div>
-      <div class="main-content-article">互锁故障(8)</div>
+      <div class="main-content-article">互锁故障(12)</div>
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 
-const act = ref(true)
+const act = ref(false)
 //
 function showMeng() {
   act.value = !act.value

@@ -56,6 +56,8 @@
   },
   "dependencies": {
     "echarts": "^5.4.1",
+    "mitt": "^2.1.0",
+    "normalize.css": "^8.0.1",
     "pinia": "^2.0.33",
     "postcss-px-to-viewport": "^1.1.1",
     "sass": "^1.59.3",

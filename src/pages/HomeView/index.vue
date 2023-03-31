@@ -1,9 +1,27 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watchEffect, watch } from 'vue'
 import { generReference } from '../../pinia/homeView.js'
 // import
 import CustomEcharts from '../../components/echarts/CustomEcharts.vue'
 import JGshow from './JGshow.vue'
+import { storeToRefs } from 'pinia'
+import bus from '../../utils/eventBus'
+import { count } from 'console'
+
+// 引入store
+const store = generReference()
+const {
+  deviceTemperature,
+  gunTemperature,
+  timelyGas,
+  laserPower,
+  swingPicture,
+  swingAmplitude,
+  swingFrequency,
+  laserFrequency,
+  laserPrecent,
+  laserAlarm,
+} = storeToRefs(store)
 
 // 激光提示
 // const JGshowb = websocketLIstanbul.laserSwitch
@@ -11,27 +29,108 @@ const JGshowb = ref(false)
 const laserSwitch = ref(false)
 
 // websocket接收到的参数
-const websocketLIstanbul = ref({})
+// const websocketLIstanbul = ref({})
 // 报警指示灯
-const laserAlarm = ref(true)
+// const laserAlarm = ref(true)
+// 激光Echarts传递
+const laserPowerAll = ref(0)
+console.log(laserPower.value)
+watchEffect(() => {
+  laserPower
+  // console.log(laserPower.value)
+})
+
+watch(deviceTemperature, (newV, oldV) => {
+  console.log(newV, oldV)
+  if (newV > 100) {
+    alert('error')
+  }
+})
+watch(gunTemperature, (newV, oldV) => {
+  if (newV > 1000) {
+    alert('error')
+  }
+})
+watch(timelyGas, (newV, oldV) => {
+  if (newV > 1000) {
+    alert('error')
+  }
+})
+// 摆动图形
+watch(swingPicture, (newV, oldV) => {
+  if (newV > 1000) {
+    alert('error')
+  }
+})
+// 摆动幅度
+watch(swingAmplitude, (newV, oldV) => {
+  if (newV > 1000) {
+    alert('error')
+  }
+})
+// 摆动频率
+watch(swingFrequency, (newV, oldV) => {
+  if (newV > 1000) {
+    alert('error')
+  }
+})
+// 激光频率
+watch(laserFrequency, (newV, oldV) => {
+  if (newV > 1000) {
+    alert('error')
+  }
+})
+// 占空比
+watch(laserPrecent, (newV, oldV) => {
+  if (newV > 1000) {
+    alert('error')
+  }
+})
 
 function JGshowfn() {
   JGshowb.value = !JGshowb.value
-  // sendSock(laserSwitch)
+  this.laserSwitch = !this.laserSwitch
+  console.log(laserSwitch)
 }
 
 function ChangePullFocus() {
-  console.log('change')
+  console.log('拉焦点取反')
+
+  this.pullFocus = !this.pullFocus
 }
-function ChangeManualBlowing() {}
-function ChangeFishWeld() {}
-function ChangeSendSiSwitch() {}
+function ChangeManualBlowing() {
+  console.log('手动吹气取反')
+  this.manualBlowing = !this.manualBlowing
+}
+function ChangeFishWeld() {
+  console.log('鱼鳞取反')
+  this.fishWeld = !this.fishWeld
+}
+function ChangeSendSiSwitch() {
+  console.log('送丝取反')
+  this.sendSiSwitch = !this.sendSiSwitch
+}
+// 激光功率减
+function JianLaserPower() {
+  this.laserPower -= 100
+}
+// 激光功率加
+function AddLaserPower() {
+  this.laserPower += 100
+}
+
+// function changeNum() {
+//   bus.emit('changNumber', itemNumber[0].number)
+// }
+const GyNum = ref(0)
+function GongyiNum() {
+  bus.on('changNumber', count => {
+    this.GyNum = count
+  })
+}
+console.log(count)
+console.log(GyNum.value + '23')
 onMounted(() => {})
-
-// 引入store
-const store = generReference()
-
-// console.log(store.websocketLIstanbul.fishWeld)
 </script>
 
 <template>
@@ -42,10 +141,11 @@ const store = generReference()
           <div class="contentArea-left-top-item1-sta">
             {{ $t('shebeiWendu') }}
           </div>
-          <div class="contentArea-left-top-item1-mid">
-            {{ store.websocketLIstanbul.deviceTemperature }}
-            <!-- {{ msg.buSiDelay }}+123 -->
-          </div>
+          <input
+            class="contentArea-left-top-item1-mid"
+            type="number"
+            v-model="deviceTemperature" />
+
           <div class="contentArea-left-top-item1-end">℃</div>
         </div>
         <div class="contentArea-left-top-item1">
@@ -53,20 +153,23 @@ const store = generReference()
             {{ $t('qiangtouWendu') }}
           </div>
 
-          <div class="contentArea-left-top-item1-mid">
-            {{ store.websocketLIstanbul.gunTemperature }}
-          </div>
+          <input
+            class="contentArea-left-top-item1-mid"
+            type="number"
+            v-model="gunTemperature" />
+
           <div class="contentArea-left-top-item1-end">℃</div>
         </div>
         <div class="contentArea-left-top-item1">
           <div class="contentArea-left-top-item1-sta">
             {{ $t('shishiQiya') }}
           </div>
+          <input
+            class="contentArea-left-top-item1-mid"
+            type="number"
+            v-model="timelyGas" />
 
-          <div class="contentArea-left-top-item1-mid">
-            {{ store.websocketLIstanbul.timelyGas }}
-          </div>
-          <div class="contentArea-left-top-item1-end">Bar</div>
+          <div class="contentArea-left-top-item1-end">L/min</div>
         </div>
       </div>
       <div class="contentArea-left-mid">
@@ -74,21 +177,29 @@ const store = generReference()
           <div class="contentArea-left-mid-item1-text">
             {{ $t('jiguangqi') }}
           </div>
-          <div class="contentArea-left-mid-item1-pic"></div>
+          <div
+            class="contentArea-left-mid-item1-pic"
+            :class="laserAlarm ? '' : 'iconFail'"></div>
         </div>
         <div class="contentArea-left-mid-item2">
           <div class="contentArea-left-mid-item2-text">{{ $t('tongxun') }}</div>
-          <div class="contentArea-left-mid-item1-pic"></div>
+          <div
+            class="contentArea-left-mid-item1-pic"
+            :class="laserAlarm ? '' : 'iconFail'"></div>
         </div>
         <div class="contentArea-left-mid-item1">
           <div class="contentArea-left-mid-item1-text">
             {{ $t('zhenjing') }}
           </div>
-          <div class="contentArea-left-mid-item1-pic2"></div>
+          <div
+            class="contentArea-left-mid-item1-pic"
+            :class="laserAlarm ? '' : 'iconFail'"></div>
         </div>
         <div class="contentArea-left-mid-item2">
           <div class="contentArea-left-mid-item2-text">{{ $t('baohuqi') }}</div>
-          <div class="contentArea-left-mid-item1-pic"></div>
+          <div
+            class="contentArea-left-mid-item1-pic"
+            :class="laserAlarm ? '' : 'iconFail'"></div>
         </div>
       </div>
       <div class="contentArea-left-bottom">
@@ -100,11 +211,17 @@ const store = generReference()
     </div>
     <div class="contentArea-mid">
       <div class="contentArea-mid-top">
-        <CustomEcharts class="contentArea-mid-top-charts" />
+        <CustomEcharts
+          class="contentArea-mid-top-charts"
+          :laserPower="laserPower" />
         <div class="contentArea-mid-top-button">
-          <div class="contentArea-mid-top-button-Jian"></div>
+          <div
+            class="contentArea-mid-top-button-Jian"
+            @click="JianLaserPower()"></div>
           <div class="contentArea-mid-top-button-Mid">激光功率</div>
-          <div class="contentArea-mid-top-button-Add"></div>
+          <div
+            class="contentArea-mid-top-button-Add"
+            @click="AddLaserPower()"></div>
         </div>
         <div class="contentArea-mid-top-item">
           <!-- <div class="contentArea-mid-top-item-cart">
@@ -124,7 +241,10 @@ const store = generReference()
         </div>
         <div class="contentArea-mid-bottom-item2">
           <div>{{ $t('gongyiNum') }}</div>
-          <div><input class="contentArea-mid-bottom-item2-input" /></div>
+          <div>
+            <!-- <input class="contentArea-mid-bottom-item2-input" /> -->
+            {{ GyNum }}
+          </div>
         </div>
       </div>
     </div>
@@ -134,9 +254,11 @@ const store = generReference()
           <div class="contentArea-right-top-item-sta">
             {{ $t('baidongPic') }}
           </div>
-          <div class="contentArea-right-top-item-mid">
-            {{ store.websocketLIstanbul.swingPicture }}
-          </div>
+          <input
+            class="contentArea-right-top-item-mid"
+            type="number"
+            v-model="swingPicture" />
+
           <div class="contentArea-right-top-item-end"></div>
         </div>
         <div class="contentArea-right-top-item">
@@ -144,9 +266,11 @@ const store = generReference()
             {{ $t('baidongFudu') }}
           </div>
           <!-- <input class="contentArea-right-top-item-mid" type="text" /> -->
-          <div class="contentArea-right-top-item-mid">
-            {{ store.websocketLIstanbul.swingAmplitude }}
-          </div>
+          <input
+            class="contentArea-right-top-item-mid"
+            v-model="swingAmplitude"
+            type="number" />
+
           <div class="contentArea-right-top-item-end">mm</div>
         </div>
         <div class="contentArea-right-top-item">
@@ -154,19 +278,22 @@ const store = generReference()
             {{ $t('baidongPinglv') }}
           </div>
 
-          <div class="contentArea-right-top-item-mid">
-            {{ store.websocketLIstanbul.swingFrequency }}
-          </div>
+          <input
+            class="contentArea-right-top-item-mid"
+            type="number"
+            v-model="swingFrequency" />
+
           <div class="contentArea-right-top-item-end">Hz</div>
         </div>
         <div class="contentArea-right-top-item">
           <div class="contentArea-right-top-item-sta">
             {{ $t('jiguangPinglv') }}
           </div>
+          <input
+            class="contentArea-right-top-item-mid"
+            type="number"
+            v-model="laserFrequency" />
 
-          <div class="contentArea-right-top-item-mid">
-            {{ store.websocketLIstanbul.laserFrequency }}
-          </div>
           <div class="contentArea-right-top-item-end">Hz</div>
         </div>
         <div class="contentArea-right-top-item">
@@ -174,9 +301,11 @@ const store = generReference()
             {{ $t('zhankongPre') }}
           </div>
 
-          <div class="contentArea-right-top-item-mid">
-            {{ store.websocketLIstanbul.laserPrecent }}
-          </div>
+          <input
+            class="contentArea-right-top-item-mid"
+            type="number"
+            v-model="laserPrecent" />
+
           <div class="contentArea-right-top-item-end">%</div>
         </div>
       </div>
@@ -264,6 +393,15 @@ const store = generReference()
           margin-left: 10px;
           border-radius: 6px;
           background: #47628f;
+          color: #ffffff;
+          font-family: PingFang SC;
+          font-weight: bold;
+          font-size: 20px;
+          line-height: normal;
+          letter-spacing: 0px;
+          text-align: center;
+          // margin-right: 20px;
+          line-height: 48px;
         }
 
         &-end {
@@ -612,6 +750,13 @@ const store = generReference()
           border-radius: 6px;
           background: #47628f;
           height: 46px;
+          color: #ffffff;
+          font-family: PingFang SC;
+          font-weight: bold;
+          font-size: 20px;
+          line-height: 46px;
+          letter-spacing: 0px;
+          text-align: center;
         }
 
         &-end {
@@ -713,5 +858,14 @@ const store = generReference()
   margin-left: 54px;
   margin-top: 10px;
   background-image: url('../../assets/icons/switchOn.png');
+}
+
+// 红色图标
+.iconFail {
+  margin-top: 10px;
+  margin-left: 62px;
+  width: 32px;
+  height: 32px;
+  background-image: url('../../assets/icons/redicon.png');
 }
 </style>

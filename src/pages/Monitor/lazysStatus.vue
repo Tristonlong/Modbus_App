@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-let timeCount = ref(225)
+let timeCount = ref(5)
 let showDialog = ref(true)
 const timer = ref()
 const count = ref()

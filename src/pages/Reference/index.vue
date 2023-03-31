@@ -1,5 +1,29 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import bus from '../../utils/eventBus'
+const itemNumber = reactive([
+  {
+    number: 1,
+    bancai: 20,
+    houdu: 30,
+    gonglv: 40,
+    zhankongbi: 40,
+    pinglv: 20,
+    baifu: 20,
+    baidongpinglv: 50,
+    songsisudu: 20,
+    beizhu: 10,
+  },
+])
+const count = ref(22)
+
+function transfoProps() {
+  bus.emit('changNumber', this.itemNumber[0].number)
+}
+
+function Edit() {
+  alert('修改')
+}
 </script>
 
 <template>
@@ -16,6 +40,30 @@ import { ref, reactive } from 'vue'
           <td class="reference-title">摆幅mm</td>
           <td class="reference-title">摆动频率Hz</td>
           <td class="reference-title">送丝速度</td>
+          <td class="reference-title">备注</td>
+        </tr>
+        <tr class="reference-content-tr" v-for="(item, index) in itemNumber">
+          <td>{{ item.number }}</td>
+          <td>{{ item.bancai }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="reference-content-trs">
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td>4</td>
+          <td>5</td>
+          <td>6</td>
+          <td>7</td>
+          <td>8</td>
+          <td>9</td>
         </tr>
         <tr class="reference-content-tr">
           <td>1</td>
@@ -39,29 +87,6 @@ import { ref, reactive } from 'vue'
           <td>8</td>
           <td>9</td>
         </tr>
-        <tr class="reference-content-tr">
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-          <td>4</td>
-          <td>5</td>
-          <td>6</td>
-          <td>7</td>
-          <td>8</td>
-          <td>9</td>
-        </tr>
-        <tr class="reference-content-trs">
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-          <td>4</td>
-          <td>5</td>
-          <td>6</td>
-          <td>7</td>
-          <td>8</td>
-          <td>9</td>
-        </tr>
-
         <tr class="reference-content-tr">
           <td>1</td>
           <td>2</td>
@@ -133,7 +158,9 @@ import { ref, reactive } from 'vue'
 
     <div class="referencebottom">
       <div class="refitem1">工艺号</div>
-      <div class="refitem5">123</div>
+      <div class="refitem5" @click="transfoProps">
+        {{ itemNumber[0].number }}
+      </div>
       <div class="refitem2">调用</div>
       <div class="refitem3">断电保存</div>
       <div class="refitem4">还原</div>

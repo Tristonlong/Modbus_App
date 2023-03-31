@@ -1,78 +1,124 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { generReference } from '../../pinia/homeView.js'
+import { storeToRefs } from 'pinia'
+// import { watch } from 'fs'
 const onswitch = ref(true)
+const store = generReference()
+const {
+  swingSwitch,
+  swingPicture,
+  xaxisEnlarge,
+  xaxisCenterOffset,
+  copperMouthRelaxTime,
+  blowairBefore,
+  onPower,
+  blowairDelay,
+  offPower,
+  swingFrequency,
+  risingTime,
+  lowerTime,
+  offDelay,
+  swingAmplitude,
+  fishWeldUnworkTime,
+  fishWeldWorkTime,
+} = storeToRefs(store)
 // const props = defineProps({})
 // 开关
 function setOn(v) {
   onswitch.value = v
   console.log('点击')
+  this.swingSwitch.value = !this.swingSwitch.value
+  // console.log(store.websocketLIstanbul.swingSwitch)
 }
 
+function GetNumberTwo(v) {
+  return Math.round((v * 1000) / 1000)
+}
 // x轴+
 function Xaxiosadd() {
-  console.log('---')
+  this.xaxisCenterOffset += 0.1
 }
 // x轴-
 function Xaxiosslice() {
-  console.log('++++')
+  this.xaxisCenterOffset -= 0.1
+  console.log(store.websocketLIstanbul.xaxisCenterOffset)
 }
-
 // 参数 还原
 function ChangeReference() {
   console.log('参数还原')
 }
 
+watch(swingPicture, (n, o) => {
+  console.log(n, o)
+  if (n > 10) {
+    alert('error')
+  }
+})
+watch(swingFrequency, (n, o) => {
+  if (n > 10) {
+    alert('error')
+  }
+})
+watch(swingAmplitude, (n, o) => {
+  if (n > 10) {
+    alert('error')
+  }
+})
 onMounted(() => {})
-
-const store = generReference()
 </script>
-
 <template>
   <div class="setting">
     <div class="settingleft">
       <div class="settingleft-title">{{ $t('zhenjingSet') }}</div>
+      <!-- 按钮 -->
       <div class="settingleft-item">
         <div class="settingleft-item-sta">{{ $t('baidongSwitch') }}</div>
         <div class="settingleft-item-mid">
           <div
             class="settingleft-item-mid-fir"
-            @click="setOn(false)"
-            :class="onswitch ? '' : 'onSwitact'">
+            @click="setOn(swingSwitch)"
+            :class="onswitch ? 'onSwitact' : ''">
             ON
           </div>
           <div
             class="settingleft-item-mid-end"
-            @click="setOn(true)"
-            :class="onswitch ? 'onSwitact' : ''">
+            @click="setOn(swingSwitch)"
+            :class="onswitch ? '' : 'onSwitact2'">
             OFF
           </div>
         </div>
-        <div class="settingleft-item-end"></div>
       </div>
-      <div class="settingleft-item">
-        <div class="settingleft-item-sta">{{ $t('baidongPic') }}</div>
-        <!-- <div> class="settingleft-item-mid" /> -->
-        <div class="settingleft-item-mid">
-          {{ store.websocketLIstanbul.swingPicture }}
-        </div>
-        <div class="settingleft-item-end"></div>
+
+      <div class="settingleft-items">
+        <div class="settingleft-items-sta">{{ $t('baidongPic') }}</div>
+
+        <input
+          class="settingleft-items-mid"
+          type="number"
+          v-model="swingPicture" />
+
+        <div class="settingleft-items-end"></div>
       </div>
-      <div class="settingleft-item">
-        <div class="settingleft-item-sta">{{ $t('baidongFudu') }}</div>
+      <div class="settingleft-items">
+        <div class="settingleft-items-sta">{{ $t('baidongFudu') }}</div>
         <!-- <div> class="settingleft-item-mid" /> -->
-        <div class="settingleft-item-mid">
-          {{ store.websocketLIstanbul.swingAmplitude }}
-        </div>
-        <div class="settingleft-item-end">mm</div>
+        <input
+          class="settingleft-items-mid"
+          type="number"
+          v-model="swingAmplitude" />
+
+        <div class="settingleft-items-end">mm</div>
       </div>
-      <div class="settingleft-item">
-        <div class="settingleft-item-sta">{{ $t('baidongPinglv') }}</div>
+      <div class="settingleft-items">
+        <div class="settingleft-items-sta">{{ $t('baidongPinglv') }}</div>
         <!-- <div> class="settingleft-item-mid" /> -->
-        <div class="settingleft-item-mid">
-          {{ store.websocketLIstanbul.swingFrequency }}
-        </div>
-        <div class="settingleft-item-end">Hz</div>
+        <input
+          class="settingleft-items-mid"
+          type="number"
+          v-model="swingFrequency" />
+
+        <div class="settingleft-items-end">Hz</div>
       </div>
       <div class="settingleft-bottom">
         <div class="settingleft-bottom-pic">
@@ -87,7 +133,7 @@ const store = generReference()
               </div>
               <div class="settingleft-bottom-right-item-mid">
                 <div class="settingleft-bottom-right-item-mid-sel">
-                  {{ store.websocketLIstanbul.yaxisCenterOffset }}
+                  {{ xaxisCenterOffset.toFixed(1) }}
                 </div>
                 <div class="settingleft-bottom-right-item-end">mm</div>
               </div>
@@ -101,7 +147,7 @@ const store = generReference()
               </div>
               <div class="settingleft-bottom-right-item-mid">
                 <div class="settingleft-bottom-right-item-mid-sel">
-                  {{ store.websocketLIstanbul.xaxisEnlarge }}
+                  {{ xaxisEnlarge }}
                 </div>
                 <div class="settingleft-bottom-right-item-end"></div>
               </div>
@@ -117,49 +163,49 @@ const store = generReference()
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">吹气提前</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.blowairBefore }}
+            {{ blowairBefore }}
           </div>
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">吹气延时</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.blowairDelay }}
+            {{ blowairDelay }}
           </div>
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">开光功率</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.onPower }}
+            {{ onPower }}
           </div>
           <div class="settingright-top-item-end">w</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">关光功率</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.offPower }}
+            {{ offPower }}
           </div>
           <div class="settingright-top-item-end">W</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">缓升时间</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.risingTime }}
+            {{ risingTime }}
           </div>
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">缓降时间</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.lowerTime }}
+            {{ lowerTime }}
           </div>
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">关光延时</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.offDelay }}
+            {{ offDelay }}
           </div>
           <div class="settingright-top-item-end">ms</div>
         </div>
@@ -168,21 +214,21 @@ const store = generReference()
         <div class="settingright-bottom-item">
           <div class="settingright-bottom-item-sta">鱼鳞焊间隔时间</div>
           <div class="settingright-bottom-mid">
-            {{ store.websocketLIstanbul.fishWeldUnworkTime }}
+            {{ fishWeldUnworkTime }}
           </div>
           <div class="settingright-top-item-end">mm</div>
         </div>
         <div class="settingright-bottom-item">
           <div class="settingright-bottom-item-sta2">鱼鳞焊持续时间</div>
           <div class="settingright-bottom-mid">
-            {{ store.websocketLIstanbul.fishWeldWorkTime }}
+            {{ fishWeldWorkTime }}
           </div>
           <div class="settingright-top-item-end">mm</div>
         </div>
         <div class="settingright-bottom-item">
           <div class="settingright-bottom-item-sta">铜嘴放松时间</div>
           <div class="settingright-top-item-mid">
-            {{ store.websocketLIstanbul.copperMouthRelaxTime }}
+            {{ copperMouthRelaxTime }}
           </div>
           <div class="settingright-top-item-end">mm</div>
         </div>
@@ -280,7 +326,51 @@ const store = generReference()
         margin-left: 10px;
       }
     }
-
+    &-items {
+      display: flex;
+      flex-direction: row;
+      margin-top: 20px;
+      margin-left: 20px;
+      &-sta {
+        color: #ffffff;
+        font-family: PingFang SC;
+        font-weight: bold;
+        font-size: 24px;
+        line-height: normal;
+        letter-spacing: 0px;
+        text-align: left;
+        line-height: 50px;
+        margin-right: 10px;
+      }
+      &-mid {
+        width: 234px;
+        height: 50px;
+        border-radius: 6px;
+        background: #47628f;
+        display: flex;
+        flex-direction: row;
+        color: #ffffff;
+        font-family: PingFang SC;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: normal;
+        letter-spacing: 0px;
+        text-align: right;
+        align-items: center;
+        justify-content: center;
+      }
+      &-end {
+        color: #ffffff;
+        font-family: PingFang SC;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: normal;
+        letter-spacing: 0px;
+        text-align: left;
+        line-height: 50px;
+        margin-left: 10px;
+      }
+    }
     &-bottom {
       margin-top: 20px;
       height: 200px;
@@ -322,10 +412,11 @@ const store = generReference()
             font-family: PingFang SC;
             font-weight: bold;
             font-size: 24px;
-            line-height: normal;
+            line-height: 46px;
             letter-spacing: 0px;
-            text-align: left;
+            // text-align: center;
             margin-top: 5px;
+            // padding-left: 10px;
           }
 
           &-mid {
@@ -393,6 +484,13 @@ const store = generReference()
           height: 50px;
           border-radius: 6px;
           background: #47628f;
+          color: #ffffff;
+          font-family: PingFang SC;
+          font-weight: bold;
+          font-size: 20px;
+          line-height: 46px;
+          letter-spacing: 0px;
+          text-align: center;
         }
 
         &-end {
@@ -422,6 +520,13 @@ const store = generReference()
         height: 50px;
         border-radius: 6px;
         background: #47628f;
+        color: #ffffff;
+        font-family: PingFang SC;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 46px;
+        letter-spacing: 0px;
+        text-align: center;
       }
 
       &-item {
@@ -479,6 +584,12 @@ const store = generReference()
 }
 
 .onSwitact {
+  background: #07a96b;
+  // width: 100px;
+  height: 50px;
+  border-radius: 6px;
+}
+.onSwitact2 {
   background: #07a96b;
   // width: 100px;
   height: 50px;

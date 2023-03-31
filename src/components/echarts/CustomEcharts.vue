@@ -9,16 +9,27 @@
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { PieChart, BarChart, GaugeChart } from 'echarts/charts'
+import { LegendComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 import { computed, onMounted } from 'vue'
 // import { DataZoomComponent } from 'echarts/components'
 
-use([CanvasRenderer, PieChart, BarChart, GaugeChart])
+use([CanvasRenderer, PieChart, BarChart, GaugeChart, LegendComponent])
 //props传递
 // const props = defineProps({
 // })
 onMounted(() => {})
-var dataArr = 6130
+// props.laserPower
+
+const props = defineProps({
+  laserPower: {
+    type: Number,
+    default() {
+      return 0
+    },
+  },
+})
+
 const option = computed(() => {
   return {
     legend: {
@@ -38,7 +49,7 @@ const option = computed(() => {
     series: [
       // 刻度值
       {
-        name: '外部刻度',
+        // name: '外部刻度',
         type: 'gauge',
         radius: '90',
         min: 0,
@@ -68,7 +79,7 @@ const option = computed(() => {
       },
       // 底层
       {
-        name: '内部宽线条',
+        // name: '内部宽线条',
         type: 'gauge',
         radius: '154',
         startAngle: 186,
@@ -99,7 +110,7 @@ const option = computed(() => {
       },
       //   间隔条形
       {
-        name: '间隔条形',
+        // name: '间隔条形',
         type: 'gauge',
         radius: '120',
         min: 0,
@@ -139,7 +150,7 @@ const option = computed(() => {
       },
       // 数据
       {
-        name: '内层数据刻度',
+        // name: '内层数据刻度',
         type: 'gauge',
         radius: '91',
         z: 3,
@@ -154,10 +165,7 @@ const option = computed(() => {
           lineStyle: {
             width: 10,
             // color: [[0.2, '#77D97F'],[0.8, '#4285F4'],[1, '#FF7E7F']],
-            color: [
-              // [dataArr/10000,'#fff'],
-              [1, '#1c5a73'],
-            ],
+            color: [[1, '#1c5a73']],
           },
         },
         progress: {
@@ -173,7 +181,7 @@ const option = computed(() => {
               y2: 1,
               colorStops: [
                 {
-                  offset: dataArr / 10000 / 6,
+                  offset: props.laserPower / 10000 / 6,
                   color: '#ffffff',
                 },
                 {
@@ -263,51 +271,51 @@ const option = computed(() => {
         },
         data: [
           {
-            value: dataArr,
+            value: props.laserPower,
           },
         ],
       },
       // 最外层线
-      {
-        type: 'gauge',
-        name: '外层辅助',
-        radius: 102,
-        startAngle: 188,
-        // center: ['50%', '75%'],
-        endAngle: -9,
-        min: 0,
-        max: 24000,
-        splitNumber: 4,
-        pointer: {
-          show: false,
-        },
-        axisLine: {
-          roundCap: true,
-          show: true,
-          lineStyle: {
-            color: [[1, '#3ea0b5']],
-            width: 3,
-            opacity: 0.5,
-            shadowColor: 'rgba(0,138,255,0.45)',
-            shadowBlur: 5,
-            shadowOffsetX: 1,
-            shadowOffsetY: 1,
-          },
-        },
+      // {
+      //   type: 'gauge',
+      //   name: '外层辅助',
+      //   radius: 102,
+      //   startAngle: 188,
+      //   // center: ['50%', '75%'],
+      //   endAngle: -9,
+      //   min: 0,
+      //   max: 24000,
+      //   splitNumber: 4,
+      //   pointer: {
+      //     show: false,
+      //   },
+      //   axisLine: {
+      //     roundCap: true,
+      //     show: true,
+      //     lineStyle: {
+      //       color: [[1, '#3ea0b5']],
+      //       width: 3,
+      //       opacity: 0.5,
+      //       shadowColor: 'rgba(0,138,255,0.45)',
+      //       shadowBlur: 5,
+      //       shadowOffsetX: 1,
+      //       shadowOffsetY: 1,
+      //     },
+      //   },
 
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
-        axisLabel: {
-          show: false,
-        },
-      },
+      //   axisTick: {
+      //     show: false,
+      //   },
+      //   splitLine: {
+      //     show: false,
+      //   },
+      //   axisLabel: {
+      //     show: false,
+      //   },
+      // },
       // 最内层线
       {
-        name: '最内层线',
+        // name: '最内层线',
         type: 'gauge',
         radius: '110',
 
@@ -362,7 +370,7 @@ const option = computed(() => {
         },
         data: [
           {
-            value: dataArr,
+            value: props.laserPower,
           },
         ],
       },
