@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import bus from '../../utils/eventBus'
+import { generReference } from '../../pinia/homeView'
+import { storeToRefs } from 'pinia'
+// 设置参数
+// laserPower ,laserFrequency,laserPrecent,swingAmplitude , swingFrequency,songSiSpeed,remark
 const itemNumber = reactive([
   {
     number: 1,
@@ -15,7 +19,16 @@ const itemNumber = reactive([
     beizhu: 10,
   },
 ])
-const count = ref(22)
+
+const store = generReference()
+const {
+  laserPower,
+  laserFrequency,
+  laserPrecent,
+  swingAmplitude,
+  swingFrequency,
+  songSiSpeed,
+} = storeToRefs(store)
 
 function transfoProps() {
   bus.emit('changNumber', this.itemNumber[0].number)
@@ -42,17 +55,26 @@ function Edit() {
           <td class="reference-title">送丝速度</td>
           <td class="reference-title">备注</td>
         </tr>
-        <tr class="reference-content-tr" v-for="(item, index) in itemNumber">
+        <tr
+          class="reference-content-tr"
+          :key="index"
+          v-for="(item, index) in itemNumber">
           <td>{{ item.number }}</td>
           <td>{{ item.bancai }}</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td>{{ item.houdu }}</td>
+          <td><input v-model="laserPower" class="input" type="number" /></td>
+          <td><input v-model="laserPrecent" class="input" type="number" /></td>
+          <td>
+            <input v-model="laserFrequency" class="input" type="number" />
+          </td>
+          <td>
+            <input v-model="swingAmplitude" class="input" type="number" />
+          </td>
+          <td>
+            <input v-model="swingFrequency" class="input" type="number" />
+          </td>
+          <td><input :value="item.houdu" class="input" type="number" /></td>
+          <td><input :value="item.houdu" class="input" /></td>
         </tr>
         <tr class="reference-content-trs">
           <td>1</td>
@@ -290,5 +312,11 @@ function Edit() {
     line-height: 60px;
     letter-spacing: 0px;
   }
+}
+.input {
+  background: #47628f;
+  height: 50px;
+  width: 120px;
+  text-align: center;
 }
 </style>

@@ -69,5 +69,8 @@
   "chouSiLength": 1,
   "songSiDelay": 1,
   "buSiDelay": 1,
-  "goStep": 1
+  "goStep": 1,
+
+  "remark": "asd",
+  "songSiSpeed": 1
 }

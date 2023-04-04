@@ -4,7 +4,11 @@ import { ref, onMounted } from 'vue'
 import Header from './layout/Header.vue'
 import tarbar from './layout/tarbar.vue'
 import Locking from './pages/Locking/index.vue'
-import Emergency from './pages/Dialog/Emergency.vue'
+
+import v2keyboard from './keyboard/v2keyboard.vue'
+// import SimpleKeyboard from 'simple-keyboard'
+// import wcKeyBoard from ''
+// import keyboard from './keyboard/index.vue'
 
 import { sendSock, createWebSocket, closeSock } from './utils/websocket'
 
@@ -44,6 +48,10 @@ onMounted(() => {})
       </div>
       <!-- 显示页面 -->
       <router-view></router-view>
+      <!-- <Mainboard></Mainboard> -->
+      <!-- <Allnumber></Allnumber> -->
+      <!-- <SimpleKeyboard></SimpleKeyboard> -->
+      <!-- <v2keyboard></v2keyboard> -->
       <Locking
         v-show="showLockingView"
         @click="unLocking()"

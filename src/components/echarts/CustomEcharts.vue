@@ -35,7 +35,7 @@ const option = computed(() => {
     legend: {
       orient: 'vertical',
       right: 10,
-      top: 120,
+      top: 20,
       bottom: 20,
       itemWidth: 15, // 图例图形的宽度
       itemHeight: 20, // 图例图形的高度
@@ -51,13 +51,13 @@ const option = computed(() => {
       {
         // name: '外部刻度',
         type: 'gauge',
-        radius: '90',
+        radius: '130',
         min: 0,
         max: 24000,
-
+        // center: ['40%', '10%'],
         splitNumber: 5, //刻度数量
         startAngle: 186,
-        endAngle: -6,
+        endAngle: -10,
         axisLine: {
           show: false,
           lineStyle: {
@@ -81,9 +81,9 @@ const option = computed(() => {
       {
         // name: '内部宽线条',
         type: 'gauge',
-        radius: '154',
-        startAngle: 186,
-        endAngle: -6,
+        radius: '150',
+        startAngle: 0,
+        endAngle: 0,
 
         axisLine: {
           roundCap: true,
@@ -93,7 +93,7 @@ const option = computed(() => {
           },
         },
         axisLabel: {
-          show: false,
+          show: true,
         },
         axisTick: {
           show: false,
@@ -112,7 +112,8 @@ const option = computed(() => {
       {
         // name: '间隔条形',
         type: 'gauge',
-        radius: '120',
+        show: false,
+        radius: '135',
         min: 0,
         max: 24000,
 
@@ -152,7 +153,7 @@ const option = computed(() => {
       {
         // name: '内层数据刻度',
         type: 'gauge',
-        radius: '91',
+        radius: '150',
         z: 3,
         min: 0,
         max: 24000,
@@ -163,7 +164,7 @@ const option = computed(() => {
         axisLine: {
           roundCap: true,
           lineStyle: {
-            width: 10,
+            width: 20,
             // color: [[0.2, '#77D97F'],[0.8, '#4285F4'],[1, '#FF7E7F']],
             color: [[1, '#1c5a73']],
           },
@@ -204,7 +205,7 @@ const option = computed(() => {
           },
         },
         tooltip: {
-          show: false,
+          show: true,
         },
         axisLabel: {
           show: false,
@@ -317,7 +318,7 @@ const option = computed(() => {
       {
         // name: '最内层线',
         type: 'gauge',
-        radius: '110',
+        radius: '90',
 
         startAngle: 192,
         min: 0,
@@ -374,6 +375,13 @@ const option = computed(() => {
           },
         ],
       },
+      // {
+      //   type: 'gauge',
+      //   detail: {
+      //     formatter: '{value}%',
+      //   },
+
+      // },
     ],
   }
 })
@@ -382,6 +390,7 @@ const option = computed(() => {
 <style scoped>
 .echarts {
   height: 350px;
+  padding-top: 20px;
   width: 450px;
   background-color: RGB(54, 69, 97);
 }

@@ -45,6 +45,10 @@ const router = createRouter({
       name: 'Locking',
       component: Locking,
     },
+    {
+      path: '/',
+      redirect: '/pages/HomeView',
+    },
   ],
 })
 

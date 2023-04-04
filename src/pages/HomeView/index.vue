@@ -1,14 +1,14 @@
 <script setup>
 import { ref, reactive, onMounted, computed, watchEffect, watch } from 'vue'
 import { generReference } from '../../pinia/homeView.js'
+import v2keyboard from '../../keyboard/v2keyboard.vue'
 // import
 import CustomEcharts from '../../components/echarts/CustomEcharts.vue'
 import JGshow from './JGshow.vue'
 import { storeToRefs } from 'pinia'
-import bus from '../../utils/eventBus'
-import { count } from 'console'
 
-// 引入store
+// import { count } from 'console'
+
 const store = generReference()
 const {
   deviceTemperature,
@@ -119,238 +119,254 @@ function AddLaserPower() {
   this.laserPower += 100
 }
 
-// function changeNum() {
-//   bus.emit('changNumber', itemNumber[0].number)
-// }
 const GyNum = ref(0)
-function GongyiNum() {
-  bus.on('changNumber', count => {
-    this.GyNum = count
-  })
-}
-console.log(count)
+// function GongyiNum() {
+//   bus.on('changNumber', count => {
+//     this.GyNum = count
+//   })
+// }
+// console.log(count)
 console.log(GyNum.value + '23')
+
+//  键盘显示
+const keyboardZHshow = ref(true)
+function showZhkeyboard() {
+  keyboardZHshow.value = !keyboardZHshow.value
+}
 onMounted(() => {})
 </script>
 
 <template>
-  <div class="contentArea">
-    <div class="contentArea-left">
-      <div class="contentArea-left-top">
-        <div class="contentArea-left-top-item1">
-          <div class="contentArea-left-top-item1-sta">
-            {{ $t('shebeiWendu') }}
-          </div>
-          <input
-            class="contentArea-left-top-item1-mid"
-            type="number"
-            v-model="deviceTemperature" />
+  <div class="main">
+    <div class="contentArea">
+      <div class="contentArea-left">
+        <div class="contentArea-left-top">
+          <div class="contentArea-left-top-item1">
+            <div
+              class="contentArea-left-top-item1-sta"
+              @click="showZhkeyboard()">
+              {{ $t('shebeiWendu') }}
+            </div>
+            <input
+              class="contentArea-left-top-item1-mid"
+              type="number"
+              v-model="deviceTemperature" />
 
-          <div class="contentArea-left-top-item1-end">℃</div>
+            <div class="contentArea-left-top-item1-end">℃</div>
+          </div>
+          <div class="contentArea-left-top-item1">
+            <div class="contentArea-left-top-item1-sta">
+              {{ $t('qiangtouWendu') }}
+            </div>
+
+            <input
+              class="contentArea-left-top-item1-mid"
+              type="number"
+              v-model="gunTemperature" />
+
+            <div class="contentArea-left-top-item1-end">℃</div>
+          </div>
+          <div class="contentArea-left-top-item1">
+            <div class="contentArea-left-top-item1-sta">
+              {{ $t('shishiQiya') }}
+            </div>
+            <input
+              class="contentArea-left-top-item1-mid"
+              type="number"
+              v-model="timelyGas" />
+
+            <div class="contentArea-left-top-item1-end">L/min</div>
+          </div>
         </div>
-        <div class="contentArea-left-top-item1">
-          <div class="contentArea-left-top-item1-sta">
-            {{ $t('qiangtouWendu') }}
+        <div class="contentArea-left-mid">
+          <div class="contentArea-left-mid-item1">
+            <div class="contentArea-left-mid-item1-text">
+              {{ $t('jiguangqi') }}
+            </div>
+            <div
+              class="contentArea-left-mid-item1-pic"
+              :class="laserAlarm ? '' : 'iconFail'"></div>
           </div>
-
-          <input
-            class="contentArea-left-top-item1-mid"
-            type="number"
-            v-model="gunTemperature" />
-
-          <div class="contentArea-left-top-item1-end">℃</div>
+          <div class="contentArea-left-mid-item2">
+            <div class="contentArea-left-mid-item2-text">
+              {{ $t('tongxun') }}
+            </div>
+            <div
+              class="contentArea-left-mid-item1-pic"
+              :class="laserAlarm ? '' : 'iconFail'"></div>
+          </div>
+          <div class="contentArea-left-mid-item1">
+            <div class="contentArea-left-mid-item1-text">
+              {{ $t('zhenjing') }}
+            </div>
+            <div
+              class="contentArea-left-mid-item1-pic"
+              :class="laserAlarm ? '' : 'iconFail'"></div>
+          </div>
+          <div class="contentArea-left-mid-item2">
+            <div class="contentArea-left-mid-item2-text">
+              {{ $t('baohuqi') }}
+            </div>
+            <div
+              class="contentArea-left-mid-item1-pic"
+              :class="laserAlarm ? '' : 'iconFail'"></div>
+          </div>
         </div>
-        <div class="contentArea-left-top-item1">
-          <div class="contentArea-left-top-item1-sta">
-            {{ $t('shishiQiya') }}
+        <div class="contentArea-left-bottom">
+          <div class="contentArea-left-bottom-item1">
+            {{ $t('anquanLock') }}
+            <div class="contentArea-left-bottom-item1-title"></div>
           </div>
-          <input
-            class="contentArea-left-top-item1-mid"
-            type="number"
-            v-model="timelyGas" />
-
-          <div class="contentArea-left-top-item1-end">L/min</div>
         </div>
       </div>
-      <div class="contentArea-left-mid">
-        <div class="contentArea-left-mid-item1">
-          <div class="contentArea-left-mid-item1-text">
-            {{ $t('jiguangqi') }}
+      <div class="contentArea-mid">
+        <div class="contentArea-mid-top">
+          <CustomEcharts
+            class="contentArea-mid-top-charts"
+            :laserPower="laserPower" />
+          <div class="contentArea-mid-top-button">
+            <div
+              class="contentArea-mid-top-button-Jian"
+              @click="JianLaserPower()"></div>
+            <div class="contentArea-mid-top-button-Mid">激光功率</div>
+            <div
+              class="contentArea-mid-top-button-Add"
+              @click="AddLaserPower()"></div>
           </div>
-          <div
-            class="contentArea-left-mid-item1-pic"
-            :class="laserAlarm ? '' : 'iconFail'"></div>
-        </div>
-        <div class="contentArea-left-mid-item2">
-          <div class="contentArea-left-mid-item2-text">{{ $t('tongxun') }}</div>
-          <div
-            class="contentArea-left-mid-item1-pic"
-            :class="laserAlarm ? '' : 'iconFail'"></div>
-        </div>
-        <div class="contentArea-left-mid-item1">
-          <div class="contentArea-left-mid-item1-text">
-            {{ $t('zhenjing') }}
-          </div>
-          <div
-            class="contentArea-left-mid-item1-pic"
-            :class="laserAlarm ? '' : 'iconFail'"></div>
-        </div>
-        <div class="contentArea-left-mid-item2">
-          <div class="contentArea-left-mid-item2-text">{{ $t('baohuqi') }}</div>
-          <div
-            class="contentArea-left-mid-item1-pic"
-            :class="laserAlarm ? '' : 'iconFail'"></div>
-        </div>
-      </div>
-      <div class="contentArea-left-bottom">
-        <div class="contentArea-left-bottom-item1">
-          {{ $t('anquanLock') }}
-          <div class="contentArea-left-bottom-item1-title"></div>
-        </div>
-      </div>
-    </div>
-    <div class="contentArea-mid">
-      <div class="contentArea-mid-top">
-        <CustomEcharts
-          class="contentArea-mid-top-charts"
-          :laserPower="laserPower" />
-        <div class="contentArea-mid-top-button">
-          <div
-            class="contentArea-mid-top-button-Jian"
-            @click="JianLaserPower()"></div>
-          <div class="contentArea-mid-top-button-Mid">激光功率</div>
-          <div
-            class="contentArea-mid-top-button-Add"
-            @click="AddLaserPower()"></div>
-        </div>
-        <div class="contentArea-mid-top-item">
-          <!-- <div class="contentArea-mid-top-item-cart">
+          <div class="contentArea-mid-top-item">
+            <!-- <div class="contentArea-mid-top-item-cart">
                                                                                                                                                                                                                                                                                                                                     <button class="contentArea-mid-top-item-cart-btnl">-</button>
                                                                                                                                                                                                                                                                                                                                     <div class="contentArea-mid-top-item-cart-text">激光功率</div>
                                                                                                                                                                                                                                                                                                                                     <button class="contentArea-mid-top-item-cart-btnr">+</button>
                                                                                                                                                                                                                                                                                                                                 </div> -->
+          </div>
+        </div>
+        <div class="contentArea-mid-bottom">
+          <div class="contentArea-mid-bottom-item1">
+            <div>{{ $t('jiguangSwit') }}</div>
+            <div
+              class="contentArea-mid-bottom-item1-pic"
+              :class="JGshowb ? 'acSwitch' : ''"
+              @click="JGshowfn()"></div>
+          </div>
+          <div class="contentArea-mid-bottom-item2">
+            <div>{{ $t('gongyiNum') }}</div>
+            <div>
+              <!-- <input class="contentArea-mid-bottom-item2-input" /> -->
+              {{ GyNum }}
+            </div>
+          </div>
         </div>
       </div>
-      <div class="contentArea-mid-bottom">
-        <div class="contentArea-mid-bottom-item1">
-          <div>{{ $t('jiguangSwit') }}</div>
-          <div
-            class="contentArea-mid-bottom-item1-pic"
-            :class="JGshowb ? 'acSwitch' : ''"
-            @click="JGshowfn()"></div>
+      <div class="contentArea-right">
+        <div class="contentArea-right-top">
+          <div class="contentArea-right-top-item">
+            <div class="contentArea-right-top-item-sta">
+              {{ $t('baidongPic') }}
+            </div>
+            <input
+              class="contentArea-right-top-item-mid"
+              type="number"
+              v-model="swingPicture" />
+
+            <div class="contentArea-right-top-item-end"></div>
+          </div>
+          <div class="contentArea-right-top-item">
+            <div class="contentArea-right-top-item-sta">
+              {{ $t('baidongFudu') }}
+            </div>
+            <!-- <input class="contentArea-right-top-item-mid" type="text" /> -->
+            <input
+              class="contentArea-right-top-item-mid"
+              v-model="swingAmplitude"
+              type="number" />
+
+            <div class="contentArea-right-top-item-end">mm</div>
+          </div>
+          <div class="contentArea-right-top-item">
+            <div class="contentArea-right-top-item-sta">
+              {{ $t('baidongPinglv') }}
+            </div>
+
+            <input
+              class="contentArea-right-top-item-mid"
+              type="number"
+              v-model="swingFrequency" />
+
+            <div class="contentArea-right-top-item-end">Hz</div>
+          </div>
+          <div class="contentArea-right-top-item">
+            <div class="contentArea-right-top-item-sta">
+              {{ $t('jiguangPinglv') }}
+            </div>
+            <input
+              class="contentArea-right-top-item-mid"
+              type="number"
+              v-model="laserFrequency" />
+
+            <div class="contentArea-right-top-item-end">Hz</div>
+          </div>
+          <div class="contentArea-right-top-item">
+            <div class="contentArea-right-top-item-sta">
+              {{ $t('zhankongPre') }}
+            </div>
+
+            <input
+              class="contentArea-right-top-item-mid"
+              type="number"
+              v-model="laserPrecent" />
+
+            <div class="contentArea-right-top-item-end">%</div>
+          </div>
         </div>
-        <div class="contentArea-mid-bottom-item2">
-          <div>{{ $t('gongyiNum') }}</div>
-          <div>
-            <!-- <input class="contentArea-mid-bottom-item2-input" /> -->
-            {{ GyNum }}
+        <div class="contentArea-right-bottom">
+          <div class="contentArea-right-bottom-item">
+            <div class="contentArea-right-bottom-item-text">
+              {{ $t('lajiaodian') }}
+            </div>
+            <div
+              class="contentArea-right-bottom-item-pic1"
+              @click="ChangePullFocus()"></div>
+          </div>
+          <div class="contentArea-right-bottom-item2">
+            <div
+              class="contentArea-right-bottom-item-text"
+              @click="ChangeManualBlowing()">
+              {{ $t('shoudongchuiqi') }}
+            </div>
+            <div class="contentArea-right-bottom-item2-pic2"></div>
+          </div>
+          <div class="contentArea-right-bottom-item">
+            <div
+              class="contentArea-right-bottom-item-text"
+              @click="ChangeFishWeld()">
+              {{ $t('yulingdianhan') }}
+            </div>
+            <div class="contentArea-right-bottom-item-pic3"></div>
+          </div>
+          <div class="contentArea-right-bottom-item2">
+            <div
+              class="contentArea-right-bottom-item-text"
+              @click="ChangeSendSiSwitch()">
+              {{ $t('songsikaiguan') }}
+            </div>
+            <div class="contentArea-right-bottom-item2-pic4"></div>
           </div>
         </div>
       </div>
     </div>
-    <div class="contentArea-right">
-      <div class="contentArea-right-top">
-        <div class="contentArea-right-top-item">
-          <div class="contentArea-right-top-item-sta">
-            {{ $t('baidongPic') }}
-          </div>
-          <input
-            class="contentArea-right-top-item-mid"
-            type="number"
-            v-model="swingPicture" />
-
-          <div class="contentArea-right-top-item-end"></div>
-        </div>
-        <div class="contentArea-right-top-item">
-          <div class="contentArea-right-top-item-sta">
-            {{ $t('baidongFudu') }}
-          </div>
-          <!-- <input class="contentArea-right-top-item-mid" type="text" /> -->
-          <input
-            class="contentArea-right-top-item-mid"
-            v-model="swingAmplitude"
-            type="number" />
-
-          <div class="contentArea-right-top-item-end">mm</div>
-        </div>
-        <div class="contentArea-right-top-item">
-          <div class="contentArea-right-top-item-sta">
-            {{ $t('baidongPinglv') }}
-          </div>
-
-          <input
-            class="contentArea-right-top-item-mid"
-            type="number"
-            v-model="swingFrequency" />
-
-          <div class="contentArea-right-top-item-end">Hz</div>
-        </div>
-        <div class="contentArea-right-top-item">
-          <div class="contentArea-right-top-item-sta">
-            {{ $t('jiguangPinglv') }}
-          </div>
-          <input
-            class="contentArea-right-top-item-mid"
-            type="number"
-            v-model="laserFrequency" />
-
-          <div class="contentArea-right-top-item-end">Hz</div>
-        </div>
-        <div class="contentArea-right-top-item">
-          <div class="contentArea-right-top-item-sta">
-            {{ $t('zhankongPre') }}
-          </div>
-
-          <input
-            class="contentArea-right-top-item-mid"
-            type="number"
-            v-model="laserPrecent" />
-
-          <div class="contentArea-right-top-item-end">%</div>
-        </div>
-      </div>
-      <div class="contentArea-right-bottom">
-        <div class="contentArea-right-bottom-item">
-          <div class="contentArea-right-bottom-item-text">
-            {{ $t('lajiaodian') }}
-          </div>
-          <div
-            class="contentArea-right-bottom-item-pic1"
-            @click="ChangePullFocus()"></div>
-        </div>
-        <div class="contentArea-right-bottom-item2">
-          <div
-            class="contentArea-right-bottom-item-text"
-            @click="ChangeManualBlowing()">
-            {{ $t('shoudongchuiqi') }}
-          </div>
-          <div class="contentArea-right-bottom-item2-pic2"></div>
-        </div>
-        <div class="contentArea-right-bottom-item">
-          <div
-            class="contentArea-right-bottom-item-text"
-            @click="ChangeFishWeld()">
-            {{ $t('yulingdianhan') }}
-          </div>
-          <div class="contentArea-right-bottom-item-pic3"></div>
-        </div>
-        <div class="contentArea-right-bottom-item2">
-          <div
-            class="contentArea-right-bottom-item-text"
-            @click="ChangeSendSiSwitch()">
-            {{ $t('songsikaiguan') }}
-          </div>
-          <div class="contentArea-right-bottom-item2-pic4"></div>
-        </div>
-      </div>
+    <div v-show="JGshowb" @click="JGshowfn()" :class="JGshowb ? 'active' : ''">
+      <JGshow></JGshow>
     </div>
-  </div>
-  <div v-show="JGshowb" @click="JGshowfn()" :class="JGshowb ? 'active' : ''">
-    <JGshow></JGshow>
+    <v2keyboard v-if="keyboardZHshow" class="v2keyboard"></v2keyboard>
+    <!-- <div class="demo">2323</div> -->
   </div>
 </template>
 
 <style lang="scss" scoped>
+// .main {
+//   position: absolute;
+// }
 .contentArea {
   display: flex;
   flex-direction: row;
@@ -859,7 +875,6 @@ onMounted(() => {})
   margin-top: 10px;
   background-image: url('../../assets/icons/switchOn.png');
 }
-
 // 红色图标
 .iconFail {
   margin-top: 10px;
@@ -867,5 +882,10 @@ onMounted(() => {})
   width: 32px;
   height: 32px;
   background-image: url('../../assets/icons/redicon.png');
+}
+.v2keyboard {
+  position: relative;
+  width: 20px;
+  height: 100px;
 }
 </style>
