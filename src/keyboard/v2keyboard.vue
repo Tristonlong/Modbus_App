@@ -59,10 +59,11 @@ export default {
 <style scoped>
 .keyboardClass {
   position: fixed;
+  /* background-color: aqua; */
   left: 20;
   top: 0;
-  width: 200px;
-  height: 200px;
+  width: 600px;
+  height: 400px;
   /* background-color: red; */
 }
 </style>

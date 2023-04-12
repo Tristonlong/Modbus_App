@@ -6,6 +6,7 @@ import v2keyboard from '../../keyboard/v2keyboard.vue'
 import CustomEcharts from '../../components/echarts/CustomEcharts.vue'
 import JGshow from './JGshow.vue'
 import { storeToRefs } from 'pinia'
+import gengealKeyboard from '../../keyboard/gengealKeyboard.vue'
 
 // import { count } from 'console'
 
@@ -129,7 +130,7 @@ const GyNum = ref(0)
 console.log(GyNum.value + '23')
 
 //  键盘显示
-const keyboardZHshow = ref(true)
+const keyboardZHshow = ref(false)
 function showZhkeyboard() {
   keyboardZHshow.value = !keyboardZHshow.value
 }
@@ -142,14 +143,13 @@ onMounted(() => {})
       <div class="contentArea-left">
         <div class="contentArea-left-top">
           <div class="contentArea-left-top-item1">
-            <div
-              class="contentArea-left-top-item1-sta"
-              @click="showZhkeyboard()">
+            <div class="contentArea-left-top-item1-sta">
               {{ $t('shebeiWendu') }}
             </div>
             <input
               class="contentArea-left-top-item1-mid"
               type="number"
+              @click="showZhkeyboard()"
               v-model="deviceTemperature" />
 
             <div class="contentArea-left-top-item1-end">℃</div>
@@ -162,6 +162,7 @@ onMounted(() => {})
             <input
               class="contentArea-left-top-item1-mid"
               type="number"
+              @click="showZhkeyboard()"
               v-model="gunTemperature" />
 
             <div class="contentArea-left-top-item1-end">℃</div>
@@ -173,6 +174,7 @@ onMounted(() => {})
             <input
               class="contentArea-left-top-item1-mid"
               type="number"
+              @click="showZhkeyboard()"
               v-model="timelyGas" />
 
             <div class="contentArea-left-top-item1-end">L/min</div>
@@ -267,6 +269,7 @@ onMounted(() => {})
             <input
               class="contentArea-right-top-item-mid"
               type="number"
+              @click="showZhkeyboard()"
               v-model="swingPicture" />
 
             <div class="contentArea-right-top-item-end"></div>
@@ -279,6 +282,7 @@ onMounted(() => {})
             <input
               class="contentArea-right-top-item-mid"
               v-model="swingAmplitude"
+              @click="showZhkeyboard()"
               type="number" />
 
             <div class="contentArea-right-top-item-end">mm</div>
@@ -291,6 +295,7 @@ onMounted(() => {})
             <input
               class="contentArea-right-top-item-mid"
               type="number"
+              @click="showZhkeyboard()"
               v-model="swingFrequency" />
 
             <div class="contentArea-right-top-item-end">Hz</div>
@@ -302,6 +307,7 @@ onMounted(() => {})
             <input
               class="contentArea-right-top-item-mid"
               type="number"
+              @click="showZhkeyboard()"
               v-model="laserFrequency" />
 
             <div class="contentArea-right-top-item-end">Hz</div>
@@ -314,6 +320,7 @@ onMounted(() => {})
             <input
               class="contentArea-right-top-item-mid"
               type="number"
+              @click="showZhkeyboard()"
               v-model="laserPrecent" />
 
             <div class="contentArea-right-top-item-end">%</div>
@@ -358,9 +365,11 @@ onMounted(() => {})
     <div v-show="JGshowb" @click="JGshowfn()" :class="JGshowb ? 'active' : ''">
       <JGshow></JGshow>
     </div>
-    <v2keyboard v-if="keyboardZHshow" class="v2keyboard"></v2keyboard>
+
     <!-- <div class="demo">2323</div> -->
   </div>
+  <v2keyboard v-if="keyboardZHshow" class="v2keyboard"></v2keyboard>
+  <gengealKeyboard v-if="keyboardZHshow"></gengealKeyboard>
 </template>
 
 <style lang="scss" scoped>
@@ -885,7 +894,7 @@ onMounted(() => {})
 }
 .v2keyboard {
   position: relative;
-  width: 20px;
+  width: 200px;
   height: 100px;
 }
 </style>

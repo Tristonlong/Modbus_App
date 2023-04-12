@@ -29,6 +29,12 @@ const projectId = ref({})
 
 // 紧急停止
 const EmergencyTime = ref(true)
+
+//  键盘显示
+// const keyboardZHshow = ref(true)
+// function showZhkeyboard() {
+//   keyboardZHshow.value = !keyboardZHshow.value
+// }
 onMounted(() => {})
 </script>
 
@@ -56,6 +62,7 @@ onMounted(() => {})
         v-show="showLockingView"
         @click="unLocking()"
         :class="showLockingView ? '' : 'aclockingbtn'"></Locking>
+      <!-- <v2keyboard v-if="keyboardZHshow" class="v2keyboard"></v2keyboard> -->
     </div>
 
     <!-- <Emergency class="emergency"></Emergency> -->
@@ -96,5 +103,8 @@ onMounted(() => {})
   position: fixed;
   height: 720px;
   // margin: 0px;
+}
+.v2keyboard {
+  position: fixed;
 }
 </style>
