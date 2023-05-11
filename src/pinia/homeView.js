@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, reactive, toRefs } from 'vue'
+// import { getMetersValue } from '../sever/modbus'
 import { sendSock, createWebSocket, closeSock } from '../utils/websocket'
 export const generReference = defineStore('generReference', () => {
   // websocket接收到的参数
@@ -78,10 +79,100 @@ export const generReference = defineStore('generReference', () => {
     songSiSpeed: 1,
   })
 
+  //
+  const initial = [
+    {
+      number: 1,
+      bancai: 20,
+      houdu: 30,
+      laserPower: 2000,
+      zhankongbi: 40,
+      pinglv: 20,
+      baifu: 20,
+      baidongpinglv: 50,
+      songsisudu: 20,
+      beizhu: 10,
+    },
+    {
+      number: 2,
+      bancai: 20,
+      houdu: 30,
+      laserPower: 2240,
+      zhankongbi: 40,
+      pinglv: 20,
+      baifu: 20,
+      baidongpinglv: 50,
+      songsisudu: 20,
+      beizhu: 10,
+    },
+    {
+      number: 3,
+      bancai: 20,
+      houdu: 30,
+      laserPower: 1240,
+      zhankongbi: 40,
+      pinglv: 20,
+      baifu: 20,
+      baidongpinglv: 50,
+      songsisudu: 20,
+      beizhu: 10,
+    },
+    {
+      number: 4,
+      bancai: 20,
+      houdu: 30,
+      laserPower: 3040,
+      zhankongbi: 40,
+      pinglv: 20,
+      baifu: 20,
+      baidongpinglv: 50,
+      songsisudu: 20,
+      beizhu: 10,
+    },
+    {
+      number: 5,
+      bancai: 20,
+      houdu: 30,
+      laserPower: 1640,
+      zhankongbi: 40,
+      pinglv: 20,
+      baifu: 20,
+      baidongpinglv: 50,
+      songsisudu: 20,
+      beizhu: 10,
+    },
+    {
+      number: 6,
+      bancai: 20,
+      houdu: 30,
+      laserPower: 5140,
+      zhankongbi: 40,
+      pinglv: 20,
+      baifu: 20,
+      baidongpinglv: 50,
+      songsisudu: 20,
+      beizhu: 10,
+    },
+    {
+      number: 7,
+      bancai: 20,
+      houdu: 30,
+      laserPower: 1040,
+      zhankongbi: 40,
+      pinglv: 20,
+      baifu: 20,
+      baidongpinglv: 50,
+      songsisudu: 20,
+      beizhu: 10,
+    },
+  ]
+  const params = ref(JSON.parse(JSON.stringify(initial)))
+  const selectedId = ref(1)
   // 工艺参数
-  const Reference = reactive({})
   // 报警信息
   const WarmInform = ref([])
+
+  selectedId.value = initial.number
 
   WarmInform.value = [
     '湿度过高(8)',
@@ -155,7 +246,7 @@ export const generReference = defineStore('generReference', () => {
     '驱动板11开路(111)',
     '驱动板12开路(112)',
   ]
-
+  const setGonyi = ref(1)
   // 初始化websocket
   createWebSocket(global_callback)
   // 接受到数据
@@ -170,9 +261,20 @@ export const generReference = defineStore('generReference', () => {
     data: 3,
   }
   sendSock(JSON.stringify(senData))
+
+  function resetParams() {
+    // 深拷贝
+    params.value = JSON.parse(JSON.stringify(initial))
+  }
+
   return {
+    selectedId,
+    params,
+    setGonyi,
     ...toRefs(websocketLIstanbul),
     // websocketLIstanbul,
     WarmInform,
+    resetParams,
+    initial,
   }
 })

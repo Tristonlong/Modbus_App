@@ -2,7 +2,7 @@ var websock = null
 var global_callback = null
 var serverPort = '80' // webSocket连接端口
 
-let wsurl = 'ws://192.168.50.19:1880/ws/request'
+let wsurl = 'ws://192.168.50.213:5173/ws/request'
 function createWebSocket(callback) {
   if (websock == null || typeof websock !== WebSocket) {
     initWebSocket(callback)

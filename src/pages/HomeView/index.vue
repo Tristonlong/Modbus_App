@@ -1,52 +1,38 @@
 <script setup>
-import { ref, reactive, onMounted, computed, watchEffect, watch } from 'vue'
-import { generReference } from '../../pinia/homeView.js'
+import { ref, onMounted, watch, onUnmounted, inject } from 'vue'
+
 import v2keyboard from '../../keyboard/v2keyboard.vue'
-// import
+import axios from 'axios'
 import CustomEcharts from '../../components/echarts/CustomEcharts.vue'
 import JGshow from './JGshow.vue'
-import { storeToRefs } from 'pinia'
-import gengealKeyboard from '../../keyboard/gengealKeyboard.vue'
+const deviceTemperature = ref(10)
+const gunTemperature = ref(0)
+const timelyGas = ref(100)
 
-// import { count } from 'console'
-
-const store = generReference()
-const {
-  deviceTemperature,
-  gunTemperature,
-  timelyGas,
-  laserPower,
-  swingPicture,
-  swingAmplitude,
-  swingFrequency,
-  laserFrequency,
-  laserPrecent,
-  laserAlarm,
-} = storeToRefs(store)
-
-// 激光提示
-// const JGshowb = websocketLIstanbul.laserSwitch
+const swingPicture = ref(100)
+const swingAmplitude = ref(100)
+const swingFrequency = ref(100)
+const laserFrequency = ref(100)
+const laserPrecent = ref(100)
+const laserPower = ref(100)
+const laserSwitch = ref(true)
+const commounicate = ref(true)
+const zhenjin = ref(true)
+const protectGas = ref(true)
+const laserDev = ref(true)
+const safeLock = ref(true)
+const lajiaodian = ref(true)
+const shoudongchuiqi = ref(true)
+const yulingdianhan = ref(true)
+const songsikaiguan = ref(true)
+const zhankongbi = ref(100)
+// 是否加载完毕
+const loading = ref(false)
+// 点击调用摆动幅度
 const JGshowb = ref(false)
-const laserSwitch = ref(false)
 
-// websocket接收到的参数
-// const websocketLIstanbul = ref({})
-// 报警指示灯
-// const laserAlarm = ref(true)
-// 激光Echarts传递
-const laserPowerAll = ref(0)
-console.log(laserPower.value)
-watchEffect(() => {
-  laserPower
-  // console.log(laserPower.value)
-})
-
-watch(deviceTemperature, (newV, oldV) => {
-  console.log(newV, oldV)
-  if (newV > 100) {
-    alert('error')
-  }
-})
+const shareddata = inject('shareddata')
+console.log(shareddata.value)
 watch(gunTemperature, (newV, oldV) => {
   if (newV > 1000) {
     alert('error')
@@ -87,54 +73,179 @@ watch(laserPrecent, (newV, oldV) => {
     alert('error')
   }
 })
+// const wendu = computed(() => deviceTemperature.value.data[0])
+const timer = ref(null)
+onMounted(async () => {
+  loading.value = true
 
+  const tem1 = await readMutRegister(21, 2)
+  deviceTemperature.value = tem1.data[0]
+  // 枪头温度
+  const tem2 = await readMutRegister(23, 3)
+  gunTemperature.value = tem2.data[0]
+  // 实时气压
+  const tem3 = await readMutRegister(25, 2)
+  timelyGas.value = tem3.data[0]
+  // 激光功率
+  const lazytem = await readMutRegister(1, 2)
+  laserPower.value = lazytem.data[0]
+  // 摆动图形
+  const tem4 = await readMutRegister(11, 2)
+  swingPicture.value = tem4.data[0]
+  // 摆动幅度
+  const tem5 = await readMutRegister(7, 2)
+  swingAmplitude.value = tem5.data[0]
+  // 摆动频率
+  const tem6 = await readMutRegister(9, 2)
+  swingFrequency.value = tem6.data[0]
+  // 激光频率
+  const tem7 = await readMutRegister(3, 2)
+  laserFrequency.value = tem7.data[0]
+  // 占空比
+  const tem8 = await readMutRegister(5, 2)
+  zhankongbi.value = tem8.data[0]
+  timer.value = setInterval(async () => {
+    try {
+      await readCoilds(1, 120)
+
+      //  设备温度
+      console.log('发送')
+      // deviceTemperature.value = await readMutRegister(21, 2)
+      // const wendu = deviceTemperature.value.data[0]
+
+      const tem1 = await readMutRegister(21, 2)
+      deviceTemperature.value = tem1.data[0]
+      // 枪头温度
+      const tem2 = await readMutRegister(23, 3)
+      gunTemperature.value = tem2.data[0]
+      // 实时气压
+      const tem3 = await readMutRegister(25, 2)
+      timelyGas.value = tem3.data[0]
+      // 激光功率
+      const lazytem = await readMutRegister(1, 2)
+      laserPower.value = lazytem.data[0]
+      // 摆动图形
+      const tem4 = await readMutRegister(11, 2)
+      swingPicture.value = tem4.data[0]
+      // 摆动幅度
+      const tem5 = await readMutRegister(7, 2)
+      swingAmplitude.value = tem5.data[0]
+      // 摆动频率
+      const tem6 = await readMutRegister(9, 2)
+      swingFrequency.value = tem6.data[0]
+      // 激光频率
+      const tem7 = await readMutRegister(3, 2)
+      laserFrequency.value = tem7.data[0]
+      // 占空比
+      const tem8 = await readMutRegister(5, 2)
+      zhankongbi.value = tem8.data[0]
+    } catch (error) {
+      console.log(error)
+    }
+  }, 10000)
+  // console.log($parent.SetlectId)
+  loading.value = true
+})
+onUnmounted(() => {
+  clearInterval(timer.value)
+  console.log('清除了')
+})
+
+// 读取多个寄存器
+async function readMutRegister(registerId, limit) {
+  const response1 = await axios.get(`/api/registers/${registerId}/${limit}`)
+  if (response1.status == 200) {
+    const response2 = await axios.get(`/api/registers/${registerId}/${limit}`)
+    return response2
+  }
+}
+// 读取多个线圈的值
+async function readCoilds(coilsId, limit) {
+  const response = await axios.get(`/api/coils/multiple/${coilsId}/${limit}`)
+  if (response.status == 200) {
+    // 激光器
+    laserDev.value = response.data[14]
+    // 通讯
+    commounicate.value = response.data[16]
+    // 振镜
+    zhenjin.value = response.data[17]
+    // 保护气
+    protectGas.value = response.data[18]
+
+    // 安全地锁
+    safeLock.value = response.data[9]
+    // 激光开关
+    laserSwitch.value = response.data[0]
+    // 拉焦点
+    lajiaodian.value = response.data[1]
+    // 手动吹气
+    shoudongchuiqi.value = response.data[2]
+    // 鱼鳞电焊
+    yulingdianhan.value = response.data[3]
+    // 送丝开关
+    songsikaiguan.value = response.data[4]
+    console.log(lajiaodian.value)
+    console.log(shoudongchuiqi.value)
+    console.log(yulingdianhan.value)
+    console.log(songsikaiguan.value)
+  }
+  const response2 = await axios.get(`/api/coils/multiple/${coilsId}/${limit}`)
+}
+// 写入寄存器的值
+let writeTag = false
+async function writeRegister(values) {
+  if (writeTag) {
+    return
+  }
+  writeTag = true
+  const response = await axios.post(`/api/registers/1`, {
+    value: values,
+  })
+  const statusCode = response.status
+  console.log(statusCode)
+  writeTag = false
+}
 function JGshowfn() {
   JGshowb.value = !JGshowb.value
   this.laserSwitch = !this.laserSwitch
   console.log(laserSwitch)
 }
-
 function ChangePullFocus() {
   console.log('拉焦点取反')
 
   this.pullFocus = !this.pullFocus
 }
 function ChangeManualBlowing() {
-  console.log('手动吹气取反')
+  // console.log('手动吹气取反')
   this.manualBlowing = !this.manualBlowing
 }
 function ChangeFishWeld() {
-  console.log('鱼鳞取反')
+  // console.log('鱼鳞取反')
   this.fishWeld = !this.fishWeld
 }
 function ChangeSendSiSwitch() {
-  console.log('送丝取反')
+  // console.log('送丝取反')
   this.sendSiSwitch = !this.sendSiSwitch
 }
 // 激光功率减
 function JianLaserPower() {
   this.laserPower -= 100
+  writeRegister([100, 0])
 }
 // 激光功率加
 function AddLaserPower() {
   this.laserPower += 100
+  // console.log(params.number)
+  writeRegister([laserPower.value, 0])
 }
-
-const GyNum = ref(0)
-// function GongyiNum() {
-//   bus.on('changNumber', count => {
-//     this.GyNum = count
-//   })
-// }
-// console.log(count)
-console.log(GyNum.value + '23')
-
 //  键盘显示
 const keyboardZHshow = ref(false)
-function showZhkeyboard() {
-  keyboardZHshow.value = !keyboardZHshow.value
+const input = ref('')
+function onChange(input) {
+  // let input = ref('')
+  this.input = input
 }
-onMounted(() => {})
+function onKeyPress(button) {}
 </script>
 
 <template>
@@ -146,24 +257,18 @@ onMounted(() => {})
             <div class="contentArea-left-top-item1-sta">
               {{ $t('shebeiWendu') }}
             </div>
-            <input
-              class="contentArea-left-top-item1-mid"
-              type="number"
-              @click="showZhkeyboard()"
-              v-model="deviceTemperature" />
-
+            <div class="contentArea-left-top-item1-mid">
+              {{ loading ? deviceTemperature : '' }}
+            </div>
             <div class="contentArea-left-top-item1-end">℃</div>
           </div>
           <div class="contentArea-left-top-item1">
             <div class="contentArea-left-top-item1-sta">
               {{ $t('qiangtouWendu') }}
             </div>
-
-            <input
-              class="contentArea-left-top-item1-mid"
-              type="number"
-              @click="showZhkeyboard()"
-              v-model="gunTemperature" />
+            <div class="contentArea-left-top-item1-mid">
+              {{ loading ? gunTemperature : '' }}
+            </div>
 
             <div class="contentArea-left-top-item1-end">℃</div>
           </div>
@@ -171,11 +276,9 @@ onMounted(() => {})
             <div class="contentArea-left-top-item1-sta">
               {{ $t('shishiQiya') }}
             </div>
-            <input
-              class="contentArea-left-top-item1-mid"
-              type="number"
-              @click="showZhkeyboard()"
-              v-model="timelyGas" />
+            <div class="contentArea-left-top-item1-mid">
+              {{ loading ? timelyGas : '' }}
+            </div>
 
             <div class="contentArea-left-top-item1-end">L/min</div>
           </div>
@@ -187,7 +290,7 @@ onMounted(() => {})
             </div>
             <div
               class="contentArea-left-mid-item1-pic"
-              :class="laserAlarm ? '' : 'iconFail'"></div>
+              :class="laserDev ? '' : 'iconFail'"></div>
           </div>
           <div class="contentArea-left-mid-item2">
             <div class="contentArea-left-mid-item2-text">
@@ -195,7 +298,7 @@ onMounted(() => {})
             </div>
             <div
               class="contentArea-left-mid-item1-pic"
-              :class="laserAlarm ? '' : 'iconFail'"></div>
+              :class="commounicate ? '' : 'iconFail'"></div>
           </div>
           <div class="contentArea-left-mid-item1">
             <div class="contentArea-left-mid-item1-text">
@@ -203,7 +306,7 @@ onMounted(() => {})
             </div>
             <div
               class="contentArea-left-mid-item1-pic"
-              :class="laserAlarm ? '' : 'iconFail'"></div>
+              :class="zhenjin ? '' : 'iconFail'"></div>
           </div>
           <div class="contentArea-left-mid-item2">
             <div class="contentArea-left-mid-item2-text">
@@ -211,13 +314,15 @@ onMounted(() => {})
             </div>
             <div
               class="contentArea-left-mid-item1-pic"
-              :class="laserAlarm ? '' : 'iconFail'"></div>
+              :class="protectGas ? '' : 'iconFail'"></div>
           </div>
         </div>
         <div class="contentArea-left-bottom">
           <div class="contentArea-left-bottom-item1">
             {{ $t('anquanLock') }}
-            <div class="contentArea-left-bottom-item1-title"></div>
+            <div class="contentArea-left-bottom-item1-title">
+              {{ safeLock.value }}
+            </div>
           </div>
         </div>
       </div>
@@ -255,7 +360,7 @@ onMounted(() => {})
             <div>{{ $t('gongyiNum') }}</div>
             <div>
               <!-- <input class="contentArea-mid-bottom-item2-input" /> -->
-              {{ GyNum }}
+              {{ sharedRef }}
             </div>
           </div>
         </div>
@@ -266,11 +371,9 @@ onMounted(() => {})
             <div class="contentArea-right-top-item-sta">
               {{ $t('baidongPic') }}
             </div>
-            <input
-              class="contentArea-right-top-item-mid"
-              type="number"
-              @click="showZhkeyboard()"
-              v-model="swingPicture" />
+            <div class="contentArea-right-top-item-mid">
+              {{ loading ? swingPicture : '' }}
+            </div>
 
             <div class="contentArea-right-top-item-end"></div>
           </div>
@@ -279,37 +382,33 @@ onMounted(() => {})
               {{ $t('baidongFudu') }}
             </div>
             <!-- <input class="contentArea-right-top-item-mid" type="text" /> -->
-            <input
+            <!-- <input
               class="contentArea-right-top-item-mid"
               v-model="swingAmplitude"
               @click="showZhkeyboard()"
-              type="number" />
-
+              type="number" /> -->
+            <div class="contentArea-right-top-item-mid">
+              {{ loading ? swingAmplitude : '' }}
+            </div>
             <div class="contentArea-right-top-item-end">mm</div>
           </div>
           <div class="contentArea-right-top-item">
             <div class="contentArea-right-top-item-sta">
               {{ $t('baidongPinglv') }}
             </div>
-
-            <input
-              class="contentArea-right-top-item-mid"
-              type="number"
-              @click="showZhkeyboard()"
-              v-model="swingFrequency" />
-
+            <div class="contentArea-right-top-item-mid">
+              {{ loading ? swingFrequency : '' }}
+            </div>
             <div class="contentArea-right-top-item-end">Hz</div>
           </div>
           <div class="contentArea-right-top-item">
             <div class="contentArea-right-top-item-sta">
               {{ $t('jiguangPinglv') }}
             </div>
-            <input
-              class="contentArea-right-top-item-mid"
-              type="number"
-              @click="showZhkeyboard()"
-              v-model="laserFrequency" />
 
+            <div class="contentArea-right-top-item-mid">
+              {{ loading ? laserFrequency : '' }}
+            </div>
             <div class="contentArea-right-top-item-end">Hz</div>
           </div>
           <div class="contentArea-right-top-item">
@@ -317,12 +416,9 @@ onMounted(() => {})
               {{ $t('zhankongPre') }}
             </div>
 
-            <input
-              class="contentArea-right-top-item-mid"
-              type="number"
-              @click="showZhkeyboard()"
-              v-model="laserPrecent" />
-
+            <div class="contentArea-right-top-item-mid">
+              {{ loading ? zhankongbi : '' }}
+            </div>
             <div class="contentArea-right-top-item-end">%</div>
           </div>
         </div>
@@ -368,14 +464,15 @@ onMounted(() => {})
 
     <!-- <div class="demo">2323</div> -->
   </div>
-  <v2keyboard v-if="keyboardZHshow" class="v2keyboard"></v2keyboard>
-  <gengealKeyboard v-if="keyboardZHshow"></gengealKeyboard>
+  <v2keyboard
+    v-if="keyboardZHshow"
+    @onChange="onChange"
+    @onKeyPress="onKeyPress"
+    :input="input"
+    class="v2keyboard"></v2keyboard>
 </template>
 
 <style lang="scss" scoped>
-// .main {
-//   position: absolute;
-// }
 .contentArea {
   display: flex;
   flex-direction: row;

@@ -16,15 +16,31 @@ export default {
     input: {
       type: String,
     },
+    type: {
+      default: 'text',
+      type: String,
+    },
   },
   data: () => ({
     keyboard: null,
   }),
   mounted() {
-    this.keyboard = new Keyboard(this.keyboardClass, {
-      onChange: this.onChange,
-      onKeyPress: this.onKeyPress,
-    })
+    //
+    if (this.type == 'text') {
+      this.keyboard = new Keyboard(this.keyboardClass, {
+        onChange: this.onChange,
+        onKeyPress: this.onKeyPress,
+      })
+    } else {
+      this.keyboard = new Keyboard(this.keyboardClass, {
+        onChange: this.onChange,
+        onKeyPress: this.onKeyPress,
+        layout: {
+          default: ['1 2 3', '4 5 6', '7 8 9', '{shift} 0', '{bksp} '],
+          shift: ['! / #', '$ % ^', '& * (', '{shift} ) +', '{bksp} '],
+        },
+      })
+    }
   },
   methods: {
     onChange(input) {
@@ -62,8 +78,8 @@ export default {
   /* background-color: aqua; */
   left: 20;
   top: 0;
-  width: 600px;
-  height: 400px;
+  width: 200px;
+  height: 100px;
   /* background-color: red; */
 }
 </style>

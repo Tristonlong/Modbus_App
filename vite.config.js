@@ -28,6 +28,13 @@ export default defineConfig({
   },
   server: {
     host: true,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.2.130:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
   },
   optimizeDeps: {
     exclude: ['electron'], // 告诉 Vite 排除预构建 electron，不然会出现 __diranme is not defined

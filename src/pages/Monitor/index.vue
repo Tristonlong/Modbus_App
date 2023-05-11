@@ -1,23 +1,26 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 // import lazysStatus from './lazysStatus.vue'
 import referView from './referView.vue'
 import errorView from './errorView.vue'
-import { generReference } from '../../pinia/homeView.js'
-import { storeToRefs } from 'pinia'
-const store = generReference()
-const {
-  gunSwitch,
-  laserAlarm,
-  coldDeviceAlarm,
-  communicationAlarm,
-  lensAlarm,
-  safetyGasAlarm,
-} = storeToRefs(store)
+import axios from 'axios'
+import { Timer } from 'some-library'
+const gunSwitch = ref(true)
+const laserAlarm = ref(true)
+const coldDeviceAlarm = ref(false)
+const communicationAlarm = ref(true)
+const lensAlarm = ref(true)
+const safetyGasAlarm = ref(true)
+const safeLock = ref(false)
+const zhenJinIo = ref(false)
+const lazysPower = ref(true)
+const gasSwitch = ref(false)
+const sendSi = ref(false)
 
 const ViewShow = ref(true)
 // 刷新
 const refresh = ref(false)
+
 function Refe() {
   refresh.value = !refresh.value
   console.log(refresh.value)
@@ -27,16 +30,56 @@ function Refe() {
 const lazys = ref(false)
 function LazysChange() {
   lazys.value = !lazys.value
-  console.log(lazys.value)
+  console.log('再次读取')
+  readCoilsInfo(1, 120)
 }
 // 故障
+
 const unwork = ref(true)
-
-onMounted(() => {
+const reacCoils = ref([])
+const timer = ref<Timer | null>(null)
+onMounted(async () => {
   unwork.value = true
+  await readCoilsInfo(1, 120)
+  // 固件版本号
+  const gujianVersion = await readRegister(31, 2)
+  console.log(gujianVersion)
+  // 板卡版本号
+  const bankaVersion = await readRegister(33, 2)
+  console.log(bankaVersion)
+  timer.value = setInterval(async () => {
+    await readCoilsInfo(1, 120)
+    // 固件版本号
+    const gujianVersion = await readRegister(31, 2)
+    // 板卡版本号
+    const bankaVersion = await readRegister(33, 2)
+    console.log(bankaVersion)
+  }, 10000)
 })
-
-// jg激活
+onUnmounted(() => {
+  clearInterval(timer.value)
+})
+// 请求线圈的值
+async function readCoilsInfo(startid, num) {
+  const responseCoils = await axios.get(`/api/coils/multiple/${startid}/${num}`)
+  const coils = responseCoils.data.map(response => response.data)
+  console.log(coils)
+  // 焊枪开关
+  gunSwitch.value = responseCoils.data[8]
+  safeLock.value = responseCoils.data[9]
+  zhenJinIo.value = responseCoils.data[10]
+  lazysPower.value = responseCoils.data[11]
+  gasSwitch.value = responseCoils.data[12]
+  sendSi.value = responseCoils.data[13]
+  laserAlarm.value = responseCoils[14]
+  coldDeviceAlarm.value = responseCoils[15]
+  safetyGasAlarm.value = responseCoils[17]
+}
+// 读取寄存器的值
+async function readRegister(startid, limit) {
+  const response = await axios.get(`/api/registers/${startid}/${limit}`)
+  return response
+}
 </script>
 
 <template>
@@ -52,31 +95,41 @@ onMounted(() => {
         <div class="monitor-input-content-end">焊枪开关</div>
       </div>
       <div class="monitor-input-content">
-        <div class="monitor-input-content-str"></div>
+        <div
+          class="monitor-input-content-str"
+          :class="safeLock ? '' : 'iconAlarm'"></div>
 
         <div class="monitor-input-content-mid"></div>
         <div class="monitor-input-content-end">安全地锁</div>
       </div>
       <div class="monitor-input-content">
-        <div class="monitor-input-content-str"></div>
+        <div
+          class="monitor-input-content-str"
+          :class="zhenJinIo ? '' : 'iconAlarm'"></div>
 
         <div class="monitor-input-content-mid"></div>
         <div class="monitor-input-content-end">振镜IO</div>
       </div>
       <div class="monitor-input-content">
-        <div class="monitor-input-content-str"></div>
+        <div
+          class="monitor-input-content-str"
+          :class="lazysPower ? '' : 'iconAlarm'"></div>
 
         <div class="monitor-input-content-mid"></div>
         <div class="monitor-input-content-end">激光使能</div>
       </div>
       <div class="monitor-input-content">
-        <div class="monitor-input-content-str"></div>
+        <div
+          class="monitor-input-content-str"
+          :class="gasSwitch ? '' : 'iconAlarm'"></div>
 
         <div class="monitor-input-content-mid"></div>
         <div class="monitor-input-content-end">气阀</div>
       </div>
       <div class="monitor-input-content">
-        <div class="monitor-input-content-str"></div>
+        <div
+          class="monitor-input-content-str"
+          :class="sendSi ? '' : 'iconAlarm'"></div>
 
         <div class="monitor-input-content-mid"></div>
         <div class="monitor-input-content-end">送丝</div>

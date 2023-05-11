@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive, provide } from 'vue'
 import Header from './layout/Header.vue'
 import tarbar from './layout/tarbar.vue'
 import Locking from './pages/Locking/index.vue'
@@ -18,10 +18,8 @@ function unLocking() {
   showLockingView.value = !showLockingView.value
 }
 
-function test(e) {
-  console.log(e.data)
-}
-
+const shareddata = ref(1)
+provide('shareddata', shareddata)
 // 锁定按钮触发
 const Btnlocking = ref(true)
 
@@ -30,11 +28,13 @@ const projectId = ref({})
 // 紧急停止
 const EmergencyTime = ref(true)
 
+// 选择号
+const SelectId = reactive({
+  value: 1,
+})
+
 //  键盘显示
-// const keyboardZHshow = ref(true)
-// function showZhkeyboard() {
-//   keyboardZHshow.value = !keyboardZHshow.value
-// }
+
 onMounted(() => {})
 </script>
 
@@ -54,10 +54,7 @@ onMounted(() => {})
       </div>
       <!-- 显示页面 -->
       <router-view></router-view>
-      <!-- <Mainboard></Mainboard> -->
-      <!-- <Allnumber></Allnumber> -->
-      <!-- <SimpleKeyboard></SimpleKeyboard> -->
-      <!-- <v2keyboard></v2keyboard> -->
+
       <Locking
         v-show="showLockingView"
         @click="unLocking()"

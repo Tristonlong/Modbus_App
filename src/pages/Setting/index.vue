@@ -1,35 +1,34 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { generReference } from '../../pinia/homeView.js'
-import { storeToRefs } from 'pinia'
-// import { watch } from 'fs'
+import { ref, onMounted, watch, reactive, onUnmounted } from 'vue'
+
+import InputWithKeyboard from '../../components/InputWithKeyboard/index.vue'
+import axios from 'axios'
+
+// 摆动开关
 const onswitch = ref(true)
-const store = generReference()
-const {
-  swingSwitch,
-  swingPicture,
-  xaxisEnlarge,
-  xaxisCenterOffset,
-  copperMouthRelaxTime,
-  blowairBefore,
-  onPower,
-  blowairDelay,
-  offPower,
-  swingFrequency,
-  risingTime,
-  lowerTime,
-  offDelay,
-  swingAmplitude,
-  fishWeldUnworkTime,
-  fishWeldWorkTime,
-} = storeToRefs(store)
-// const props = defineProps({})
+const swingSwitch = ref(100)
+const swingPicture = ref(0)
+const swingAmplitude = ref(200)
+const swingFrequency = ref(100)
+const xaxisEnlarge = ref(100)
+const xaxisCenterOffset = ref(100)
+
+const blowairBefore = ref(10)
+const onPower = ref(50)
+const copperMouthRelaxTime = ref(30)
+const fishWeldUnworkTime = ref(40)
+const fishWeldWorkTime = ref(60)
+const offDelay = ref(20)
+const lowerTime = ref(15)
+const risingTime = ref(10)
+const blowairDelay = ref(5)
+const offPower = ref(true)
+
 // 开关
 function setOn(v) {
   onswitch.value = v
   console.log('点击')
-  this.swingSwitch.value = !this.swingSwitch.value
-  // console.log(store.websocketLIstanbul.swingSwitch)
+  swingSwitch.value = !swingSwitch.value
 }
 
 function GetNumberTwo(v) {
@@ -42,30 +41,195 @@ function Xaxiosadd() {
 // x轴-
 function Xaxiosslice() {
   this.xaxisCenterOffset -= 0.1
-  console.log(store.websocketLIstanbul.xaxisCenterOffset)
 }
 // 参数 还原
 function ChangeReference() {
   console.log('参数还原')
+  alert('确认吗?')
+  resetParams()
 }
-
-watch(swingPicture, (n, o) => {
-  console.log(n, o)
-  if (n > 10) {
-    alert('error')
-  }
+// 键盘展示
+const keyboardZHshow = ref(false)
+function showZhkeyboard() {
+  keyboardZHshow.value = !keyboardZHshow.value
+}
+// 写入的值
+// const writeTem = 100
+// 摆动开关
+watch(onswitch, (n, o) => {
+  writeCoils([true])
 })
-watch(swingFrequency, (n, o) => {
-  if (n > 10) {
-    alert('error')
-  }
+watch(swingPicture, (n, o) => {
+  writeMuRegister(11, [swingPicture.value, 0])
 })
 watch(swingAmplitude, (n, o) => {
-  if (n > 10) {
-    alert('error')
-  }
+  writeMuRegister(7, [swingAmplitude.value, 0])
 })
-onMounted(() => {})
+watch(swingFrequency, (n, o) => {
+  writeMuRegister(9, [200, 0])
+})
+watch(xaxisCenterOffset, (n, o) => {
+  writeMuRegister(73, [swingFrequency.value, 0])
+})
+// x轴放大倍数
+watch(xaxisEnlarge, (n, o) => {
+  writeMuRegister(75, [xaxisEnlarge.value, 0])
+})
+// 监听吹气
+watch(blowairBefore, (n, o) => {
+  writeMuRegister(41, [blowairBefore.value, 0])
+})
+// 吹气延时
+watch(blowairDelay, (n, o) => {
+  writeMuRegister(43, [blowairDelay.value, 0])
+})
+// 开光功率
+watch(onPower, (n, o) => {
+  writeMuRegister(47, [onPower.value, 0])
+})
+// 关光功率
+watch(offPower, (n, o) => {
+  writeMuRegister(49, [offPower.value, 0])
+})
+// 缓生时间
+watch(risingTime, (n, o) => {
+  writeMuRegister(51, [risingTime.value, 0])
+})
+// 缓降时间
+watch(lowerTime, (n, o) => {
+  writeMuRegister((53)[(lowerTime.value, 0)])
+})
+// 关光延时
+watch(offDelay, (n, o) => {
+  writeMuRegister(45, [offDelay.value, 0])
+})
+// 鱼鳞焊接
+watch(fishWeldUnworkTime, (n, o) => {
+  writeMuRegister(57, [fishWeldUnworkTime.value, 0])
+})
+// 鱼鳞持续
+watch(fishWeldWorkTime, (n, o) => {
+  writeMuRegister(59, [fishWeldWorkTime.value, 0])
+})
+// 铜嘴放松
+watch(copperMouthRelaxTime, (n, o) => {
+  writeMuRegister(61, [200, 0])
+})
+const timer = ref(null)
+onMounted(async () => {
+  console.log('发送请求')
+  // 摆动图形
+  const tem4 = await readRegister(11, 2)
+  swingPicture.value = tem4.data[0]
+  // 摆动幅度
+  const tem5 = await readRegister(7, 2)
+  swingAmplitude.value = tem5.data[0]
+  // 摆动频率
+  const tem6 = await readRegister(9, 2)
+  swingFrequency.value = tem6.data[0]
+  // x轴偏移
+  const tem1 = await readRegister(12, 2)
+  xaxisCenterOffset.value = tem1.data[0]
+  // x轴放大
+  const tem2 = await readRegister(12, 2)
+  xaxisEnlarge.value = tem2.data[0]
+  // 吹气提前
+})
+// 清除定时器
+onUnmounted(() => {
+  clearInterval(timer.value)
+  console.log('消除2')
+})
+
+const showInput1 = ref(false)
+
+function clickInput1() {
+  showInput1.value = true
+}
+// 还原的值
+const receivedate = reactive([])
+// 写入寄存器
+let writeRegisterTag = false
+async function writeMuRegister(startid, values) {
+  if (writeRegisterTag) {
+    return
+  }
+  writeRegisterTag = true
+
+  const response = await axios.post(`/api/registers/${startid}`, {
+    value: values,
+  })
+
+  writeRegisterTag = false
+}
+// 写入线圈值,摆动开关
+async function writeCoils(values) {
+  const response = await axios.post('/api/coils/104', { value: values })
+  const statusCode = response.status
+  if (statusCode == 200) {
+    const response = await axios.post('/api/coils/104', { value: values })
+  }
+}
+// 参数（寄存器）还原发送请求
+async function resetParams() {
+  // 摆动图形
+  const reset = ref(false)
+  const requests = [
+    { url: '/api/registers/10', value: [1] },
+    { url: '/api/registers/7', value: [2] },
+    { url: '/api/registers/9', value: [100] },
+    { url: '/api/registers/73', value: [0] },
+    { url: '/api/registers/75', value: [0] },
+    { url: '/api/registers/41', value: [300] },
+    { url: '/api/registers/43', value: [200] },
+    // 关光延时
+    { url: '/api/registers/45', value: [100] },
+    { url: '/api/registers/47', value: [300] },
+    { url: '/api/registers/49', value: [300] },
+    { url: '/api/registers/51', value: [200] },
+    { url: '/api/registers/53', value: [200] },
+    { url: '/api/registers/57', value: [50] },
+    { url: '/api/registers/59', value: [10] },
+    { url: '/api/registers/61', value: [0] },
+  ]
+  for (const request of requests) {
+    const response = await axios.post(request.url, { value: request.value })
+    console.log(response)
+  }
+  reset.value = true
+  if (reset.value == true) {
+    const requests = [
+      { url: '/api/registers/10/1' },
+      { url: '/api/registers/7/1' },
+      { url: '/api/registers/9/1' },
+      { url: '/api/registers/73/1' },
+      { url: '/api/registers/75/1' },
+      { url: '/api/registers/41/1' },
+      { url: '/api/registers/43/1' },
+      { url: '/api/registers/45/1' },
+      { url: '/api/registers/47/1' },
+      { url: '/api/registers/49/1' },
+      { url: '/api/registers/51/1' },
+      { url: '/api/registers/53/1' },
+      { url: '/api/registers/57/1' },
+      { url: '/api/registers/59/1' },
+      { url: '/api/registers/61/1' },
+    ]
+    for (const request of requests) {
+      const response = await axios.get(request.url)
+      console.log(response)
+    }
+  }
+  reset.value = false
+}
+// 读取寄存器的值
+async function readRegister(registerId, limit) {
+  const response1 = await axios.get(`/api/registers/${registerId}/${limit}`)
+  if (response1.status == 200) {
+    const response2 = await axios.get(`/api/registers/${registerId}/${limit}`)
+    return response2
+  }
+}
 </script>
 <template>
   <div class="setting">
@@ -92,31 +256,29 @@ onMounted(() => {})
 
       <div class="settingleft-items">
         <div class="settingleft-items-sta">{{ $t('baidongPic') }}</div>
-
-        <input
-          class="settingleft-items-mid"
-          type="number"
-          v-model="swingPicture" />
+        <!-- 摆动图形 -->
+        <input-with-keyboard
+          v-model="swingPicture"
+          input-type="number"
+          @click="showInput1"></input-with-keyboard>
 
         <div class="settingleft-items-end"></div>
       </div>
       <div class="settingleft-items">
         <div class="settingleft-items-sta">{{ $t('baidongFudu') }}</div>
         <!-- <div> class="settingleft-item-mid" /> -->
-        <input
-          class="settingleft-items-mid"
-          type="number"
-          v-model="swingAmplitude" />
+        <input-with-keyboard
+          v-model="swingAmplitude"
+          input-type="number"></input-with-keyboard>
 
         <div class="settingleft-items-end">mm</div>
       </div>
       <div class="settingleft-items">
         <div class="settingleft-items-sta">{{ $t('baidongPinglv') }}</div>
         <!-- <div> class="settingleft-item-mid" /> -->
-        <input
-          class="settingleft-items-mid"
-          type="number"
-          v-model="swingFrequency" />
+        <input-with-keyboard
+          v-model="swingFrequency"
+          input-type="number"></input-with-keyboard>
 
         <div class="settingleft-items-end">Hz</div>
       </div>
@@ -162,74 +324,123 @@ onMounted(() => {})
       <div class="settingright-top">
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">吹气提前</div>
-          <div class="settingright-top-item-mid">
-            {{ blowairBefore }}
-          </div>
+          <!-- <div class="settingright-top-item-mid"></div> -->
+          <input-with-keyboard
+            v-model="swingPicture"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">吹气延时</div>
-          <div class="settingright-top-item-mid">
+          <!-- <div class="settingright-top-item-mid">
             {{ blowairDelay }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="blowairDelay"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">开光功率</div>
-          <div class="settingright-top-item-mid">
+          <!-- <div class="settingright-top-item-mid">
             {{ onPower }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="onPower"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">w</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">关光功率</div>
-          <div class="settingright-top-item-mid">
+          <!-- <div class="settingright-top-item-mid">
             {{ offPower }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="offPower"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">W</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">缓升时间</div>
-          <div class="settingright-top-item-mid">
+          <!-- <div class="settingright-top-item-mid">
             {{ risingTime }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="risingTime"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">缓降时间</div>
-          <div class="settingright-top-item-mid">
+          <!-- <div class="settingright-top-item-mid">
             {{ lowerTime }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="lowerTime"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
+
           <div class="settingright-top-item-end">ms</div>
         </div>
         <div class="settingright-top-item">
           <div class="settingright-top-item-sta">关光延时</div>
-          <div class="settingright-top-item-mid">
+          <!-- <div class="settingright-top-item-mid">
             {{ offDelay }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="offDelay"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">ms</div>
         </div>
       </div>
       <div class="settingright-bottom">
         <div class="settingright-bottom-item">
           <div class="settingright-bottom-item-sta">鱼鳞焊间隔时间</div>
-          <div class="settingright-bottom-mid">
+          <!-- <div class="settingright-bottom-mid">
             {{ fishWeldUnworkTime }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="fishWeldUnworkTime"
+            input-type="number"
+            class="settingright-bottom-mid"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">mm</div>
         </div>
         <div class="settingright-bottom-item">
           <div class="settingright-bottom-item-sta2">鱼鳞焊持续时间</div>
-          <div class="settingright-bottom-mid">
+          <!-- <div class="settingright-bottom-mid">
             {{ fishWeldWorkTime }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="fishWeldWorkTime"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">mm</div>
         </div>
         <div class="settingright-bottom-item">
           <div class="settingright-bottom-item-sta">铜嘴放松时间</div>
-          <div class="settingright-top-item-mid">
+          <!-- <div class="settingright-top-item-mid">
             {{ copperMouthRelaxTime }}
-          </div>
+          </div> -->
+          <input-with-keyboard
+            v-model="copperMouthRelaxTime"
+            input-type="number"
+            class="keyInput"
+            @click="showInput1"></input-with-keyboard>
           <div class="settingright-top-item-end">mm</div>
         </div>
         <div class="settingright-bottom-btn" @click="ChangeReference()">
@@ -594,5 +805,10 @@ onMounted(() => {})
   // width: 100px;
   height: 50px;
   border-radius: 6px;
+}
+.v2keyboard {
+  position: relative;
+  width: 200px;
+  height: 100px;
 }
 </style>
