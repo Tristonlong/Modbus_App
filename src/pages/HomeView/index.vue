@@ -75,17 +75,23 @@ watch(laserPrecent, (newV, oldV) => {
 })
 // const wendu = computed(() => deviceTemperature.value.data[0])
 const timer = ref(null)
+let readingTag = false
 onMounted(async () => {
   loading.value = true
-
+  readingTag = true
+  await readCoilds(1, 120)
   const tem1 = await readMutRegister(21, 2)
+  console.log(tem1)
   deviceTemperature.value = tem1.data[0]
-  // 枪头温度
+  console.log(23)
+  // // 枪头温度
   const tem2 = await readMutRegister(23, 3)
+  console.log(tem2)
   gunTemperature.value = tem2.data[0]
-  // 实时气压
+  // // 实时气压
   const tem3 = await readMutRegister(25, 2)
   timelyGas.value = tem3.data[0]
+  console.log(24)
   // 激光功率
   const lazytem = await readMutRegister(1, 2)
   laserPower.value = lazytem.data[0]
@@ -104,10 +110,11 @@ onMounted(async () => {
   // 占空比
   const tem8 = await readMutRegister(5, 2)
   zhankongbi.value = tem8.data[0]
+  readingTag = false
   timer.value = setInterval(async () => {
+    readingTag = true
     try {
       await readCoilds(1, 120)
-
       //  设备温度
       console.log('发送')
       // deviceTemperature.value = await readMutRegister(21, 2)
@@ -139,12 +146,14 @@ onMounted(async () => {
       // 占空比
       const tem8 = await readMutRegister(5, 2)
       zhankongbi.value = tem8.data[0]
+      readingTag = false
     } catch (error) {
       console.log(error)
     }
   }, 10000)
   // console.log($parent.SetlectId)
   loading.value = true
+  readingTag = false
 })
 onUnmounted(() => {
   clearInterval(timer.value)
@@ -153,14 +162,17 @@ onUnmounted(() => {
 
 // 读取多个寄存器
 async function readMutRegister(registerId, limit) {
+  readingTag = true
   const response1 = await axios.get(`/api/registers/${registerId}/${limit}`)
   if (response1.status == 200) {
     const response2 = await axios.get(`/api/registers/${registerId}/${limit}`)
     return response2
   }
+  readingTag = false
 }
 // 读取多个线圈的值
 async function readCoilds(coilsId, limit) {
+  readingTag = true
   const response = await axios.get(`/api/coils/multiple/${coilsId}/${limit}`)
   if (response.status == 200) {
     // 激光器
@@ -190,6 +202,7 @@ async function readCoilds(coilsId, limit) {
     console.log(songsikaiguan.value)
   }
   const response2 = await axios.get(`/api/coils/multiple/${coilsId}/${limit}`)
+  readingTag = false
 }
 // 写入寄存器的值
 let writeTag = false
@@ -229,13 +242,24 @@ function ChangeSendSiSwitch() {
 }
 // 激光功率减
 function JianLaserPower() {
+  console.log(readingTag)
+  if (readingTag) {
+    console.log(readingTag)
+    console.log('正在读取不能发送')
+    return
+  }
+  console.log(readingTag)
   this.laserPower -= 100
   writeRegister([100, 0])
 }
 // 激光功率加
 function AddLaserPower() {
+  if (readingTag) {
+    console.log('正在读取不能发送')
+    return
+  }
   this.laserPower += 100
-  // console.log(params.number)
+
   writeRegister([laserPower.value, 0])
 }
 //  键盘显示

@@ -22,7 +22,7 @@ const offDelay = ref(20)
 const lowerTime = ref(15)
 const risingTime = ref(10)
 const blowairDelay = ref(5)
-const offPower = ref(true)
+const offPower = ref(100)
 
 // 开关
 function setOn(v) {
@@ -56,84 +56,162 @@ function showZhkeyboard() {
 // 写入的值
 // const writeTem = 100
 // 摆动开关
+let readingTag = false
 watch(onswitch, (n, o) => {
   writeCoils([true])
 })
 watch(swingPicture, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(11, [swingPicture.value, 0])
 })
 watch(swingAmplitude, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(7, [swingAmplitude.value, 0])
 })
 watch(swingFrequency, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(9, [200, 0])
 })
 watch(xaxisCenterOffset, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(73, [swingFrequency.value, 0])
 })
 // x轴放大倍数
 watch(xaxisEnlarge, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(75, [xaxisEnlarge.value, 0])
 })
 // 监听吹气
 watch(blowairBefore, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(41, [blowairBefore.value, 0])
 })
 // 吹气延时
 watch(blowairDelay, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(43, [blowairDelay.value, 0])
 })
 // 开光功率
 watch(onPower, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(47, [onPower.value, 0])
 })
 // 关光功率
 watch(offPower, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(49, [offPower.value, 0])
 })
 // 缓生时间
 watch(risingTime, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(51, [risingTime.value, 0])
 })
 // 缓降时间
 watch(lowerTime, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister((53)[(lowerTime.value, 0)])
 })
 // 关光延时
 watch(offDelay, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(45, [offDelay.value, 0])
 })
 // 鱼鳞焊接
 watch(fishWeldUnworkTime, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(57, [fishWeldUnworkTime.value, 0])
 })
 // 鱼鳞持续
 watch(fishWeldWorkTime, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(59, [fishWeldWorkTime.value, 0])
 })
 // 铜嘴放松
 watch(copperMouthRelaxTime, (n, o) => {
+  if (readingTag) {
+    return
+  }
   writeMuRegister(61, [200, 0])
 })
 const timer = ref(null)
+
 onMounted(async () => {
+  readingTag = true
   console.log('发送请求')
   // 摆动图形
-  const tem4 = await readRegister(11, 2)
+  const tem4 = await readMutRegister(11, 2)
   swingPicture.value = tem4.data[0]
-  // 摆动幅度
-  const tem5 = await readRegister(7, 2)
+  // // 摆动幅度
+  const tem5 = await readMutRegister(7, 2)
   swingAmplitude.value = tem5.data[0]
   // 摆动频率
-  const tem6 = await readRegister(9, 2)
+  const tem6 = await readMutRegister(9, 2)
   swingFrequency.value = tem6.data[0]
   // x轴偏移
-  const tem1 = await readRegister(12, 2)
+  const tem1 = await readMutRegister(12, 2)
   xaxisCenterOffset.value = tem1.data[0]
   // x轴放大
-  const tem2 = await readRegister(12, 2)
+  const tem2 = await readMutRegister(12, 2)
   xaxisEnlarge.value = tem2.data[0]
   // 吹气提前
+  const tem9 = await readMutRegister(41, 2)
+  blowairBefore.value = tem9.data[0]
+  // 吹气延时
+  const tem10 = await readMutRegister(41, 2)
+  blowairDelay.value = tem10.data[0]
+  // 开光功率
+  const tem11 = await readMutRegister(41, 2)
+  onPower.value = tem11.data[0]
+  // 关光功率
+  const tem12 = await readMutRegister(41, 2)
+  offPower.value = tem12.data[0]
+  // 缓升时间
+  const tem13 = await readMutRegister(41, 2)
+  risingTime.value = tem13.data[0]
+  // 缓降时间
+  const tem14 = await readMutRegister(41, 2)
+  lowerTime.value = tem14.data[0]
+  // 关光延时
+  const tem15 = await readMutRegister(41, 2)
+  offDelay.value = tem15.data[0]
+  // 鱼间隔
+  const tem16 = await readMutRegister(41, 2)
+  fishWeldUnworkTime.value = tem16.data[0]
+  // 鱼持续
+  const tem17 = await readMutRegister(41, 2)
+  fishWeldWorkTime.value = tem17.data[0]
+  // 嘴松
+  const tem18 = await readMutRegister(41, 2)
+  copperMouthRelaxTime.value = tem18.data[0]
+  readingTag = false
 })
 // 清除定时器
 onUnmounted(() => {
@@ -223,7 +301,8 @@ async function resetParams() {
   reset.value = false
 }
 // 读取寄存器的值
-async function readRegister(registerId, limit) {
+async function readMutRegister(registerId, limit) {
+  // readingTag = true
   const response1 = await axios.get(`/api/registers/${registerId}/${limit}`)
   if (response1.status == 200) {
     const response2 = await axios.get(`/api/registers/${registerId}/${limit}`)
