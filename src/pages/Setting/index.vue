@@ -64,19 +64,32 @@ watch(swingPicture, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(11, [swingPicture.value, 0])
+  if (swingPicture.value >= 0) {
+    writeMuRegister(11, [swingPicture.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 watch(swingAmplitude, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(7, [swingAmplitude.value, 0])
+  if (swingAmplitude.value >= 0) {
+    writeMuRegister(7, [swingAmplitude.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 watch(swingFrequency, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(9, [200, 0])
+
+  if (swingAmplitude.value >= 0) {
+    writeMuRegister(9, [swingAmplitude.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 watch(xaxisCenterOffset, (n, o) => {
   if (readingTag) {
@@ -96,70 +109,119 @@ watch(blowairBefore, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(41, [blowairBefore.value, 0])
+
+  if (blowairBefore.value >= 0) {
+    writeMuRegister(41, [blowairBefore.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 吹气延时
 watch(blowairDelay, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(43, [blowairDelay.value, 0])
+
+  if (blowairDelay.value >= 0) {
+    writeMuRegister(43, [blowairDelay.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 开光功率
 watch(onPower, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(47, [onPower.value, 0])
+
+  if (onPower.value >= 0) {
+    writeMuRegister(47, [onPower.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 关光功率
 watch(offPower, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(49, [offPower.value, 0])
+  if (offPower.value >= 0) {
+    writeMuRegister(49, [offPower.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 缓生时间
 watch(risingTime, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(51, [risingTime.value, 0])
+
+  if (risingTime.value >= 0) {
+    writeMuRegister(51, [risingTime.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 缓降时间
 watch(lowerTime, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister((53)[(lowerTime.value, 0)])
+
+  if (lowerTime.value >= 0) {
+    writeMuRegister((53)[(lowerTime.value, 0)])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 关光延时
 watch(offDelay, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(45, [offDelay.value, 0])
+
+  if (offDelay.value >= 0) {
+    writeMuRegister(45, [offDelay.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 鱼鳞焊接
 watch(fishWeldUnworkTime, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(57, [fishWeldUnworkTime.value, 0])
+
+  if (fishWeldUnworkTime.value >= 0) {
+    writeMuRegister(57, [fishWeldUnworkTime.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 鱼鳞持续
 watch(fishWeldWorkTime, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(59, [fishWeldWorkTime.value, 0])
+
+  if (fishWeldWorkTime.value >= 0) {
+    writeMuRegister(59, [fishWeldWorkTime.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 // 铜嘴放松
 watch(copperMouthRelaxTime, (n, o) => {
   if (readingTag) {
     return
   }
-  writeMuRegister(61, [200, 0])
+
+  if (copperMouthRelaxTime.value >= 0) {
+    writeMuRegister(61, [copperMouthRelaxTime.value, 0])
+  } else {
+    alert('输入的值不能小于0')
+  }
 })
 const timer = ref(null)
 
@@ -171,16 +233,16 @@ onMounted(async () => {
   swingPicture.value = tem4.data[0]
   // // 摆动幅度
   const tem5 = await readMutRegister(7, 2)
-  swingAmplitude.value = tem5.data[0]
+  swingAmplitude.value = tem5.data[0] * 0.1
   // 摆动频率
   const tem6 = await readMutRegister(9, 2)
   swingFrequency.value = tem6.data[0]
   // x轴偏移
   const tem1 = await readMutRegister(12, 2)
-  xaxisCenterOffset.value = tem1.data[0]
+  xaxisCenterOffset.value = tem1.data[0] * 0.1
   // x轴放大
   const tem2 = await readMutRegister(12, 2)
-  xaxisEnlarge.value = tem2.data[0]
+  xaxisEnlarge.value = tem2.data[0] * 0.01
   // 吹气提前
   const tem9 = await readMutRegister(41, 2)
   blowairBefore.value = tem9.data[0]

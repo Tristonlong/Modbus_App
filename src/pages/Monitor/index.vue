@@ -4,7 +4,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import referView from './referView.vue'
 import errorView from './errorView.vue'
 import axios from 'axios'
-import { Timer } from 'some-library'
+// import { Timer } from 'some-library'
 const gunSwitch = ref(true)
 const laserAlarm = ref(true)
 const coldDeviceAlarm = ref(false)
@@ -21,23 +21,31 @@ const ViewShow = ref(true)
 // 刷新
 const refresh = ref(false)
 
+// 激光状态
+const lazys = ref(false)
 function Refe() {
   refresh.value = !refresh.value
   console.log(refresh.value)
 }
 
-// 激光状态
-const lazys = ref(false)
+// 版本固件
+// const banben = await
+
+const timer = ref(null)
 function LazysChange() {
   lazys.value = !lazys.value
   console.log('再次读取')
   readCoilsInfo(1, 120)
 }
 // 故障
-
 const unwork = ref(true)
+
+// 固件版本号
+const version = ref(1.0)
+// 板卡版本号
+const banversion = ref(1.5)
 const reacCoils = ref([])
-const timer = ref<Timer | null>(null)
+// const timer = ref<Timer | null>(null)
 onMounted(async () => {
   unwork.value = true
   await readCoilsInfo(1, 120)
@@ -47,17 +55,19 @@ onMounted(async () => {
   // 板卡版本号
   const bankaVersion = await readRegister(33, 2)
   console.log(bankaVersion)
-  timer.value = setInterval(async () => {
+  setInterval(async () => {
     await readCoilsInfo(1, 120)
     // 固件版本号
     const gujianVersion = await readRegister(31, 2)
+    version.value = gujianVersion.data[0] * 0.01
     // 板卡版本号
     const bankaVersion = await readRegister(33, 2)
+    banversion.value = bankaVersion.data[0] * 0.1
     console.log(bankaVersion)
   }, 10000)
 })
 onUnmounted(() => {
-  clearInterval(timer.value)
+  // clearInterval()
 })
 // 请求线圈的值
 async function readCoilsInfo(startid, num) {
@@ -197,8 +207,13 @@ async function readRegister(startid, limit) {
             授权到期时间：2024/03/23
           </div>
           <div class="monitor-infor-cont-content-text">HMI版本号：V9.24</div>
-          <div class="monitor-infor-cont-content-text">固件版本号：1h1m1s</div>
-          <div class="monitor-infor-cont-content-text">板卡版本号：1-1-1</div>
+          <div class="monitor-infor-cont-content-text">
+            固件版本号：
+            <!-- <div class="monitor-infor-cont-content-text">2.3.1</div> -->
+          </div>
+
+          <div class="monitor-infor-cont-content-text">板卡版本号：</div>
+          <!-- <div class="monitor-infor-cont-content-text">1.4.21</div> -->
           <div class="monitor-infor-cont-content-bottom">
             上海嘉强自动化技术有限公司
             <div class="monitor-infor-cont-content-bottom-text">

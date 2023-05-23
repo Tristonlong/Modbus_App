@@ -15,6 +15,7 @@ const swingFrequency = ref(100)
 const laserFrequency = ref(100)
 const laserPrecent = ref(100)
 const laserPower = ref(100)
+// 激光开关
 const laserSwitch = ref(true)
 const commounicate = ref(true)
 const zhenjin = ref(true)
@@ -79,18 +80,16 @@ let readingTag = false
 onMounted(async () => {
   loading.value = true
   readingTag = true
+  // 设备温度
   await readCoilds(1, 120)
   const tem1 = await readMutRegister(21, 2)
-  console.log(tem1)
-  deviceTemperature.value = tem1.data[0]
-  console.log(23)
+  deviceTemperature.value = tem1.data[0] * 0.1
   // // 枪头温度
   const tem2 = await readMutRegister(23, 3)
-  console.log(tem2)
-  gunTemperature.value = tem2.data[0]
+  gunTemperature.value = tem2.data[0] * 0.1
   // // 实时气压
   const tem3 = await readMutRegister(25, 2)
-  timelyGas.value = tem3.data[0]
+  timelyGas.value = tem3.data[0] * 0.1
   console.log(24)
   // 激光功率
   const lazytem = await readMutRegister(1, 2)
@@ -100,7 +99,7 @@ onMounted(async () => {
   swingPicture.value = tem4.data[0]
   // 摆动幅度
   const tem5 = await readMutRegister(7, 2)
-  swingAmplitude.value = tem5.data[0]
+  swingAmplitude.value = tem5.data[0] * 0.1
   // 摆动频率
   const tem6 = await readMutRegister(9, 2)
   swingFrequency.value = tem6.data[0]
@@ -218,10 +217,24 @@ async function writeRegister(values) {
   console.log(statusCode)
   writeTag = false
 }
+// 写入线圈的值
+async function writeCoils(values) {
+  const response1 = await axios.post('/api/coils/12', { value: values })
+  const statusCode = response1.status
+  if (statusCode == 200) {
+    const response1 = await axios.post('/api/coils/12', { value: values })
+  }
+}
 function JGshowfn() {
   JGshowb.value = !JGshowb.value
   this.laserSwitch = !this.laserSwitch
   console.log(laserSwitch)
+  // 激光发射
+  if (readingTag) {
+    console.log('读取中不能发送')
+    return
+  }
+  writeCoils([laserSwitch.value])
 }
 function ChangePullFocus() {
   console.log('拉焦点取反')
